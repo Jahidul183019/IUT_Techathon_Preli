@@ -21,7 +21,7 @@ To understand what the circuit is doing and why, here is exactly how our low-vol
 | Real-World Component | Wokwi Simulated Component | Purpose in Circuit |
 |----------------------|---------------------------|--------------------|
 | **Manual Wall Switch** | **Slide Switch** | Allows physical override or toggling of the device state. It sends a digital `HIGH` (3.3V) or `LOW` (0V) signal to the ESP32 to register user intent. |
-| **Relay + AC Load (Fan/Light)** | **Red LED + 220Ω Resistor** | Acts as a visual indicator showing whether the ESP32 is currently commanding the relay to power the device. An illuminated LED means the relay is closed and the AC device is ON. |
+| **Relay + AC Load (Fan/Light)** | **LED (Blue/Yellow) + 220Ω Resistor** | Acts as a visual indicator showing whether the ESP32 is currently commanding the relay to power the device. Yellow LEDs represent Lights, and Blue LEDs represent Fans. |
 | **ACS712 Current Sensor** | **Potentiometer** | Simulates varying analog power draw (wattage) from a heavy appliance like a fan. It outputs an analog voltage between 0V and 3.3V based on the slider position. |
 
 ### Real-World Equivalent Circuit Diagram
@@ -58,11 +58,11 @@ These pins read the current physical state of the environment, continuously scan
 
 | Component | ESP32 GPIO | Function | Real-World Equivalent |
 |-----------|------------|----------|-----------------------|
-| **Switch 1** | **GPIO 16** | Digital Input | Wall switch for Fan 1 |
-| **Switch 2** | **GPIO 17** | Digital Input | Wall switch for Fan 2 |
-| **Switch 3** | **GPIO 18** | Digital Input | Wall switch for Light 1 |
-| **Switch 4** | **GPIO 19** | Digital Input | Wall switch for Light 2 |
-| **Switch 5** | **GPIO 21** | Digital Input | Wall switch for Light 3 |
+| **Switch 1** | **GPIO 16** | Digital Input | Wall switch for Light 1 |
+| **Switch 2** | **GPIO 17** | Digital Input | Wall switch for Light 2 |
+| **Switch 3** | **GPIO 18** | Digital Input | Wall switch for Light 3 |
+| **Switch 4** | **GPIO 19** | Digital Input | Wall switch for Fan 1 |
+| **Switch 5** | **GPIO 21** | Digital Input | Wall switch for Fan 2 |
 | **Potentiometer**| **GPIO 34** | Analog Input (ADC1) | ACS712 measuring Fan 1 current |
 
 *Technical Note on Inputs (Floating Pins):* The switch GPIOs must use internal pull-down resistors (`INPUT_PULLDOWN`) in the software configuration. If a pin is left "floating" (connected to nothing when the switch is OFF), it acts like an antenna and picks up ambient electrical noise, causing random false ON/OFF triggers. When the slide switch is ON (connected to 3.3V), the pin reads a solid `HIGH`. When OFF, the internal pull-down resistor connects the pin weakly to Ground, ensuring it reads a clean, stable `LOW`.
@@ -72,11 +72,11 @@ These pins drive the physical loads. In the simulation, they provide the voltage
 
 | Component | ESP32 GPIO | Function | Real-World Equivalent |
 |-----------|------------|----------|-----------------------|
-| **LED 1** | **GPIO 26** | Digital Output | Relay Channel 1 -> Fan 1 |
-| **LED 2** | **GPIO 25** | Digital Output | Relay Channel 2 -> Fan 2 |
-| **LED 3** | **GPIO 27** | Digital Output | Relay Channel 3 -> Light 1 |
-| **LED 4** | **GPIO 33** | Digital Output | Relay Channel 4 -> Light 2 |
-| **LED 5** | **GPIO 32** | Digital Output | Relay Channel 5 -> Light 3 |
+| **LED 1 (Yellow)** | **GPIO 26** | Digital Output | Relay Channel 1 -> Light 1 |
+| **LED 2 (Yellow)** | **GPIO 25** | Digital Output | Relay Channel 2 -> Light 2 |
+| **LED 3 (Yellow)** | **GPIO 27** | Digital Output | Relay Channel 3 -> Light 3 |
+| **LED 4 (Blue)** | **GPIO 33** | Digital Output | Relay Channel 4 -> Fan 1 |
+| **LED 5 (Blue)** | **GPIO 32** | Digital Output | Relay Channel 5 -> Fan 2 |
 
 *Technical Note on Outputs (Current Limits):* The LEDs are driven directly by 3.3V logic signals from the ESP32. A **220Ω series resistor** is used for each LED to limit the current draw. Assuming a standard red LED has a forward voltage drop of roughly 2.0V, Ohm's law dictates the current: `I = V/R = (3.3V - 2.0V) / 220Ω ≈ 5.9mA`. The ESP32 has a strict maximum safe sourcing limit of **12mA per GPIO pin**. Drawing 5.9mA proves that this circuit is electrically sound and will not overheat or degrade the microcontroller over time.
 
@@ -95,11 +95,11 @@ Below is a schematic flow showing how the hardware logic operates inside the sim
                       ┌─────────────────────────┐
                       │       ESP32 DevKit      │
                       │                         │
-[Slide SW 1 (3.3V)] ──► GPIO 16     GPIO 26 ────┼──► [LED 1 (Fan 1)] ──► 220Ω ──► GND
-[Slide SW 2 (3.3V)] ──► GPIO 17     GPIO 25 ────┼──► [LED 2 (Fan 2)] ──► 220Ω ──► GND
-[Slide SW 3 (3.3V)] ──► GPIO 18     GPIO 27 ────┼──► [LED 3 (Light 1)] ─► 220Ω ──► GND
-[Slide SW 4 (3.3V)] ──► GPIO 19     GPIO 33 ────┼──► [LED 4 (Light 2)] ─► 220Ω ──► GND
-[Slide SW 5 (3.3V)] ──► GPIO 21     GPIO 32 ────┼──► [LED 5 (Light 3)] ─► 220Ω ──► GND
+[Slide SW 1 (3.3V)] ──► GPIO 16     GPIO 26 ────┼──► [Yellow LED 1 (Light 1)] ─► 220Ω ──► GND
+[Slide SW 2 (3.3V)] ──► GPIO 17     GPIO 25 ────┼──► [Yellow LED 2 (Light 2)] ─► 220Ω ──► GND
+[Slide SW 3 (3.3V)] ──► GPIO 18     GPIO 27 ────┼──► [Yellow LED 3 (Light 3)] ─► 220Ω ──► GND
+[Slide SW 4 (3.3V)] ──► GPIO 19     GPIO 33 ────┼──► [Blue LED 4 (Fan 1)] ─────► 220Ω ──► GND
+[Slide SW 5 (3.3V)] ──► GPIO 21     GPIO 32 ────┼──► [Blue LED 5 (Fan 2)] ─────► 220Ω ──► GND
                       │                         │
 [Potentiometer SIG] ──► GPIO 34                 │
                       │                         │
