@@ -24,11 +24,11 @@ export default function PowerInsight({ devices, estKwhToday, usage }: PowerInsig
   const workRoom2Power = getRoomPower('Work Room 2');
 
   // We set sensible reference maximum capacities to render full-scale progress bars
-  // Max capacity = (2 fans * 75W) + (3 lights * 10W) = 180W per room
+  // Max capacity = (2 fans * 60W) + (3 lights * 15W) = 165W per room
   const limits = {
-    'Drawing Room': 180, // Watts
-    'Work Room 1': 180,
-    'Work Room 2': 180,
+    'Drawing Room': 165, // Watts
+    'Work Room 1': 165,
+    'Work Room 2': 165,
   };
 
   const drawingPercent = Math.min((drawingRoomPower / limits['Drawing Room']) * 100, 100);
