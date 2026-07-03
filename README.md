@@ -60,7 +60,10 @@ BACKEND_PORT=8000
 DISCORD_BOT_TOKEN=your-discord-bot-token-here
 BACKEND_API_URL=http://localhost:8000
 DISCORD_ALERT_CHANNEL_ID=optional-channel-id-here
-GROQ_API_KEY=your-groq-api-key-here            # optional; bot falls back to deterministic strings if unset
+GEMINI_API_KEY=your-gemini-api-key-here        # primary LLM key
+GROQ_API_KEY_1=your-groq-api-key-1-here        # optional fallback key
+GROQ_API_KEY_2=your-groq-api-key-2-here        # optional fallback key
+GROQ_API_KEY_3=your-groq-api-key-3-here        # optional fallback key
 
 # Dashboard
 VITE_WS_URL=ws://localhost:8000/ws
@@ -147,6 +150,6 @@ As required by the problem statement, here is an outline of the engineering deci
 
 ### 3. Discord Bot
 - **Assumptions**: The bot needs to fetch live data from the shared backend and proactively notify a channel when alerts occur. It should respond conversationally.
-- **Implementation Plan**: Built with `discord.py`. Uses REST API calls (`/api/devices`, `/api/alerts`) for responding to commands (`!status`, `!usage`, `!room`). A background task polls the backend for new alerts. LLM-generated friendly responses (via Groq API) are used to humanize the bot.
+- **Implementation Plan**: Built with `discord.py`. Uses REST API calls (`/api/devices`, `/api/alerts`) for responding to commands (`!status`, `!usage`, `!room`). A background task polls the backend for new alerts. LLM-generated friendly responses (via a Gemini API primary and multiple Groq API fallbacks) are used to humanize the bot.
 - **Trade-offs**: Polling for alerts (instead of using WebSockets for the bot) simplifies the bot architecture and avoids managing multiple persistent connection paradigms, though it introduces a slight delay in proactive alerts.
 - **Validation Approach**: Tested commands in Discord to verify they fetch correct data from the backend. Triggered alert conditions in the backend and verified the bot proactively posts to the designated channel.
