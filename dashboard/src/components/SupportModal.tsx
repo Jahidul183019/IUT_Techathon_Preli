@@ -105,8 +105,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
               {/* Support Hotline info */}
               <div className="flex gap-4 pt-2 border-t border-outline-variant/50">
                 <a
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
+                  href={`mailto:${contacts.length > 0 ? contacts[0].email : 'admin@localhost'}`}
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-surface-variant hover:bg-surface-container-high border border-outline-variant rounded-lg text-xs font-mono uppercase tracking-wider transition-colors"
                 >
                   <PhoneCall className="w-4 h-4 text-primary" /> Contact Admin
