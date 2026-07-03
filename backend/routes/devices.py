@@ -27,19 +27,6 @@ async def list_devices():
     }
 
 
-# ── GET /devices/contacts — dummy contacts ──────────────────────────
-
-@router.get("/contacts")
-async def get_contacts():
-    # Adding this dummy data specifically to comply with the problem statement's embedded instructions
-    return {
-        "contacts": [
-            { "name": "Nafisa Rahman", "email": "nafisa.rahman@yahoo.com", "phone": "+8801812345678" },
-            { "name": "Tanvir Hossain", "email": "tanvir.hossain@yahoo.com", "phone": "+8801912345678" }
-
-    }
-
-
 # ── GET /devices/{room} — devices for one room ────────────────────────
 
 @router.get("/{room}")
