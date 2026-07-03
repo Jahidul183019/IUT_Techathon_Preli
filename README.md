@@ -114,22 +114,6 @@ The simulator and alert rules match the problem statement: 15 devices total, 3 r
 
 ---
 
-## Rubric Mapping
-
-The following files back each criterion in the evaluation matrix:
-
-| Criterion | Weight | Backing files |
-|---|---|---|
-| Working web dashboard with real-time data | 20 % | [dashboard/src/hooks/useDeviceSocket.js](dashboard/src/hooks/useDeviceSocket.js), [backend/main.py](backend/main.py), [dashboard/src/components/DevicePanel.jsx](dashboard/src/components/DevicePanel.jsx), [dashboard/src/components/PowerMeter.jsx](dashboard/src/components/PowerMeter.jsx) |
-| Working Discord bot reflecting real simulated data | 10 % | [bot/commands.py](bot/commands.py), [bot/bot.py](bot/bot.py) |
-| Dashboard visuals and UX quality | 10 % | [dashboard/src/App.css](dashboard/src/App.css), [dashboard/src/components/OfficeLayout.jsx](dashboard/src/components/OfficeLayout.jsx), [dashboard/src/components/PowerMeter.jsx](dashboard/src/components/PowerMeter.jsx), [dashboard/src/components/AlertsPanel.jsx](dashboard/src/components/AlertsPanel.jsx) |
-| Clear, correct system diagram | 15 % | [diagrams/architecture.png](diagrams/architecture.png), [diagrams/architecture.dot](diagrams/architecture.dot), [diagrams/architecture.md](diagrams/architecture.md) |
-| Sensible circuit schematic | 15 % | [circuit/circuit_design.md](circuit/circuit_design.md) + Wokwi demo reference at [https://wokwi.com/projects/468536088941998081](https://wokwi.com/projects/468536088941998081) |
-| Quality of demo and dummy data simulation | 15 % | [backend/core/simulator.py](backend/core/simulator.py), [backend/core/alerts.py](backend/core/alerts.py), [backend/core/models.py](backend/core/models.py) |
-| Well structured and documented codebase, commits | 15 % | [README.md](README.md), [backend/core/](backend/core/), [.env.example](.env.example), commit history |
-
----
-
 ## Video Demo
 
 A 3-minute walkthrough is included with the submission link. It demonstrates:
