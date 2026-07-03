@@ -104,7 +104,7 @@ def check_after_hours(now: datetime | None = None) -> list[Alert]:
             device_id=device.id,
             message=(
                 f"{emoji} {device.name} is ON after hours "
-                f"({room_name}, {now.strftime('%H:%M')} UTC)"
+                f"({room_name}, {now.strftime('%H:%M')})"
             ),
             severity=severity,
             now=now,

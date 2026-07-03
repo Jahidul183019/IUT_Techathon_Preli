@@ -115,9 +115,9 @@ class Alert(BaseModel):
 
 
 # ── Device Seed Data ───────────────────────────────────────────────────
-# Wattage references:
-#   Ceiling fan  ≈ 75W
-#   LED bulb     ≈ 10W
+# Wattage references (from problem statement):
+#   Fan          = 60W
+#   Light        = 15W
 
 DEVICE_SEED: list[dict] = []
 
@@ -135,7 +135,7 @@ for room_id, (prefix, display) in _ROOM_PREFIXES.items():
             "name": f"{display} Fan {i}",
             "type": DeviceType.FAN,
             "room": room_id,
-            "wattage": 75,
+            "wattage": 60,
         })
     # 3 lights per room
     for i in range(1, 4):
@@ -144,7 +144,7 @@ for room_id, (prefix, display) in _ROOM_PREFIXES.items():
             "name": f"{display} Light {i}",
             "type": DeviceType.LIGHT,
             "room": room_id,
-            "wattage": 10,
+            "wattage": 15,
         })
 
 assert len(DEVICE_SEED) == 15, f"Expected 15 devices, got {len(DEVICE_SEED)}"
