@@ -85,20 +85,30 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                 </div>
               )}
 
-              {/* Troubleshooting Q&A */}
-              <div className="space-y-3">
-                <p className="font-mono text-xs uppercase text-on-surface-variant font-bold tracking-wider">Troubleshooting FAQ</p>
-
-                <div className="space-y-2">
-                  <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
-                    <p className="font-bold text-xs flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5 text-tertiary" /> Critical alert about "AC Overload" is active?</p>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">This triggers when active workroom nodes exceed 1000W of combined power draw. To clear, simply toggle off high-load devices on your dashboard or floorplan.</p>
+              {/* FAQ Section */}
+              <div className="space-y-3 pt-2">
+                <h4 className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-3">
+                  Troubleshooting FAQ
+                </h4>
+                
+                <div className="bg-surface-variant/30 border border-outline-variant/30 rounded-lg p-3 space-y-1 hover:bg-surface-variant/50 transition-colors">
+                  <div className="flex items-center gap-2 text-xs font-bold text-on-surface">
+                    <ShieldAlert className="w-3.5 h-3.5 text-error" />
+                    Why are devices flagged after 5 PM?
                   </div>
+                  <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                    The system actively monitors for energy waste. Any lights or fans left running outside normal office hours (9 AM - 5 PM) trigger an after-hours alert.
+                  </p>
+                </div>
 
-                  <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
-                    <p className="font-bold text-xs flex items-center gap-1.5"><Settings className="w-3.5 h-3.5 text-primary" /> How do I map a custom IoT node?</p>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">Click the "Add Device" button on the left workspace panel. Configure the room, type, and wattage ratings to integrate it instantly into floorplans and energy bar indices.</p>
+                <div className="bg-surface-variant/30 border border-outline-variant/30 rounded-lg p-3 space-y-1 hover:bg-surface-variant/50 transition-colors">
+                  <div className="flex items-center gap-2 text-xs font-bold text-on-surface">
+                    <ServerCog className="w-3.5 h-3.5 text-primary" />
+                    What causes a continuous usage alert?
                   </div>
+                  <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                    If all 5 devices in a single room (2 fans, 3 lights) are left ON continuously for more than 2 hours, a critical alert is triggered.
+                  </p>
                 </div>
               </div>
 
