@@ -1,20 +1,43 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Smart Home IoT Dashboard
 
-# Run and deploy your AI Studio app
+A modern, responsive, and real-time frontend dashboard for monitoring and managing smart home IoT devices. Built for the IUT Techathon project.
 
-This contains everything you need to run your app locally.
+## Features
+- **Real-time Monitoring:** Connects to a FastAPI WebSocket to show live device states (ON/OFF).
+- **Interactive Floorplan:** Visual mapping of office/home layout allowing direct device interaction.
+- **Power Usage Analytics:** Tracks power consumption, active devices, and estimates daily kWh load.
+- **Alerts System:** Live notifications for high-load or out-of-hours device activity.
+- **Responsive Design:** Premium dark mode UI built with Tailwind CSS, Lucide icons, and Framer Motion.
 
-View your app in AI Studio: https://ai.studio/apps/a83ddb17-c87b-466a-867a-4019d5ef3e5f
+## Tech Stack
+- **Framework:** React 19 + TypeScript
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS v4
+- **Icons:** Lucide React
+- **Animations:** Motion (Framer Motion)
+- **Charts:** Recharts
+
+## Environment Variables
+
+To connect to a custom backend, configure the following environment variables in your deployment platform (e.g., Render, Vercel) or in a local `.env` file:
+
+```env
+VITE_API_URL=https://iot-smart-home-backend-8au0.onrender.com
+VITE_WS_URL=wss://iot-smart-home-backend-8au0.onrender.com/ws
+```
+*(If unset, it will default to the Render backend shown above, or to `http://localhost:8000` if run via the provided `shell.sh` script).*
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js (v18+)
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+*Alternatively, use the root `./shell.sh` script to run both the frontend and the FastAPI backend concurrently.*
