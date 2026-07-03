@@ -1,0 +1,172 @@
+.office-layout-panel {
+  grid-column: 1 / -1;
+  position: relative;
+  overflow: hidden;
+}
+
+.svg-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto; /* allows scrolling on very small screens */
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.office-svg {
+  width: 100%;
+  min-width: 700px;
+  height: auto;
+  display: block;
+}
+
+/* Walls */
+.wall {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.2);
+}
+.wall.exterior {
+  stroke-width: 4;
+}
+.wall.interior {
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+}
+
+/* Room Labels */
+.room-text {
+  fill: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Furniture */
+.furniture {
+  pointer-events: none;
+}
+.furn-shape {
+  fill: rgba(255, 255, 255, 0.03);
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1.5;
+}
+.furn-detail {
+  fill: rgba(255, 255, 255, 0.02);
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+/* Devices */
+.svg-device {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.svg-device:hover {
+  transform: scale(1.15);
+}
+
+/* Fan */
+.device-bg {
+  fill: var(--surface);
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2;
+  transition: all 0.3s ease;
+}
+.device-bg.on {
+  stroke: var(--accent);
+  fill: rgba(56, 189, 248, 0.1);
+}
+.device-bg.transparent {
+  fill: transparent;
+  stroke: transparent;
+}
+
+.fan-center {
+  fill: var(--text-muted);
+  transition: fill 0.3s ease;
+}
+.fan-blade {
+  fill: var(--text-muted);
+  opacity: 0.8;
+  transition: fill 0.3s ease;
+}
+.svg-device:hover .fan-blade {
+  opacity: 1;
+}
+.svg-device:hover .fan-center {
+  fill: var(--text);
+}
+.device-bg.on + .fan-blades .fan-center,
+.device-bg.on + .fan-blades .fan-blade {
+  fill: var(--accent);
+}
+
+.fan-blades.spinning {
+  transform-origin: center;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Light */
+.light-bulb {
+  fill: var(--text-muted);
+  opacity: 0.4;
+  transition: all 0.4s ease;
+}
+.light-bulb.glowing {
+  fill: var(--yellow);
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.8));
+}
+
+/* Entry Arrow */
+.entry-text {
+  fill: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Tooltip */
+.device-tooltip {
+  position: fixed;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 100;
+  min-width: 160px;
+  backdrop-filter: blur(4px);
+}
+
+.tt-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+}
+
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+.tt-row:last-child {
+  margin-bottom: 0;
+}
+
+.tt-label {
+  color: var(--text-muted);
+}
+.tt-val {
+  font-weight: 500;
+}
+.text-success { color: var(--success); }
+.text-dim { color: var(--text-muted); opacity: 0.7; }

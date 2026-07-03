@@ -1,51 +1,58 @@
-import { useState, useEffect, useRef } from 'react'
-import './App.css'
-
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws'
+import { useDeviceSocket } from './hooks/useDeviceSocket';
+import DevicePanel from './components/DevicePanel';
+import PowerMeter from './components/PowerMeter';
+import AlertsPanel from './components/AlertsPanel';
+import OfficeLayout from './components/OfficeLayout';
+import './App.css';
 
 function App() {
-  const [status, setStatus] = useState('Disconnected')
-  const [messages, setMessages] = useState([])
-  const ws = useRef(null)
-
-  useEffect(() => {
-    // Attempt WebSocket connection on mount
-    try {
-      ws.current = new WebSocket(WS_URL)
-
-      ws.current.onopen = () => setStatus('Connected')
-      ws.current.onclose = () => setStatus('Disconnected')
-      ws.current.onerror = () => setStatus('Error')
-      ws.current.onmessage = (event) => {
-        setMessages((prev) => [...prev.slice(-49), event.data])
-      }
-    } catch {
-      setStatus('Failed to connect')
-    }
-
-    return () => ws.current?.close()
-  }, [])
+  const { devices, usage, alerts, wsStatus, toggleDevice } = useDeviceSocket();
 
   return (
     <div className="app">
-      <h1>🏠 IoT Dashboard</h1>
-      <p className="greeting">Hello from the Dashboard!</p>
-      <div className="status-badge" data-status={status.toLowerCase()}>
-        WebSocket: <strong>{status}</strong>
-      </div>
-
-      {messages.length > 0 && (
-        <div className="messages">
-          <h3>Messages</h3>
-          <ul>
-            {messages.map((msg, i) => (
-              <li key={i}>{msg}</li>
-            ))}
-          </ul>
+      {/* Header */}
+      <header className="app-header">
+        <div className="header-left">
+          <h1 className="app-title">
+            <span className="title-icon">🏠</span>
+            Smart Home Monitor
+          </h1>
+          <p className="app-subtitle">Real-time IoT Dashboard</p>
         </div>
-      )}
+        <div className="header-right">
+          <div className={`ws-badge ${wsStatus}`}>
+            <span className="ws-dot" />
+            <span className="ws-label">{wsStatus}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Main grid */}
+      <main className="dashboard-grid">
+        {/* Left column */}
+        <div className="col-left">
+          <PowerMeter usage={usage} />
+          <AlertsPanel alerts={alerts} />
+        </div>
+
+        {/* Right column */}
+        <div className="col-right">
+          <DevicePanel devices={devices} onToggle={toggleDevice} />
+        </div>
+
+        {/* Full-width floor plan */}
+        <div className="col-full">
+          <OfficeLayout devices={devices} onToggle={toggleDevice} />
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="app-footer">
+        <span>IUT Techathon · IoT Smart Home Monitor</span>
+        <span className="footer-devices">{devices.length} devices tracked</span>
+      </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

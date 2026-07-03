@@ -1,87 +1,217 @@
+/* ─── Design Tokens ─────────────────────────────────────────────── */
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --text: #e2e8f0;
+  --bg: #0b0f1a;
+  --bg-subtle: #111827;
+  --surface: #1a2233;
+  --surface-hover: #1f2b3f;
+  --border: rgba(255, 255, 255, 0.06);
+  --text: #e8edf5;
+  --text-muted: #6b7a8d;
   --accent: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.15);
   --success: #22c55e;
   --error: #ef4444;
+  --yellow: #facc15;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
-* {
+/* ─── Global Reset ──────────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  line-height: 1.5;
 }
 
+#root {
+  min-height: 100vh;
+}
+
+/* ─── App Layout ────────────────────────────────────────────────── */
 .app {
-  text-align: center;
-  padding: 3rem 2rem;
-  max-width: 600px;
-}
-
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.greeting {
-  font-size: 1.25rem;
-  opacity: 0.8;
-  margin-bottom: 2rem;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-}
-
-.status-badge[data-status="connected"] {
-  border-color: var(--success);
-  color: var(--success);
-}
-
-.status-badge[data-status="error"],
-.status-badge[data-status="failed to connect"] {
-  border-color: var(--error);
-  color: var(--error);
-}
-
-.messages {
-  margin-top: 2rem;
-  text-align: left;
-  background: var(--surface);
-  border-radius: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 1.5rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.messages h3 {
-  margin-bottom: 0.75rem;
-  color: var(--accent);
+/* ─── Header ────────────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.messages ul {
-  list-style: none;
-  max-height: 300px;
-  overflow-y: auto;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
-.messages li {
-  padding: 0.35rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-family: monospace;
-  font-size: 0.85rem;
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.title-icon {
+  font-size: 1.4rem;
+}
+
+.app-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ─── WS Status Badge ──────────────────────────────────────────── */
+.ws-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.ws-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.ws-badge.connected .ws-dot {
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+}
+
+.ws-badge.connecting .ws-dot {
+  background: var(--yellow);
+  animation: pulse 1.2s ease infinite;
+}
+
+.ws-badge.disconnected .ws-dot {
+  background: var(--error);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ─── Dashboard Grid ────────────────────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1rem;
+  flex: 1;
+}
+
+.col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.col-full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Panel (shared base) ───────────────────────────────────────── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.panel-icon {
+  font-size: 1.1rem;
+}
+
+/* ─── Footer ────────────────────────────────────────────────────── */
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer-devices {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .col-full {
+    grid-column: 1;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .floor-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .room-drawing {
+    grid-column: 1 !important;
+  }
 }
