@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lightbulb, Wind } from 'lucide-react';
+import { Lightbulb, Wind, Monitor, Coffee, Armchair } from 'lucide-react';
 import { Device } from '../types';
 
 interface OfficeFloorplanProps {
@@ -34,6 +34,18 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
     );
   };
 
+  const renderAsset = (type: 'desk' | 'sofa' | 'coffee', label: string, keyId: string) => (
+    <div
+      key={keyId}
+      className="h-12 min-w-12 px-2 rounded-lg border border-outline-variant/20 bg-surface-container-lowest/30 flex flex-col items-center justify-center text-outline/40 pointer-events-none"
+    >
+      {type === 'desk' && <Monitor className="w-4 h-4 mb-1" />}
+      {type === 'sofa' && <Armchair className="w-4 h-4 mb-1" />}
+      {type === 'coffee' && <Coffee className="w-4 h-4 mb-1" />}
+      <span className="font-mono text-[8px] uppercase">{label}</span>
+    </div>
+  );
+
   return (
     <section className="bg-surface-container p-4 rounded-xl border border-outline-variant relative overflow-hidden flex flex-col justify-between h-full text-on-surface">
       <div className="mb-4">
@@ -43,39 +55,46 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
       </div>
 
       {/* Grid Blueprint Floor Plan */}
-      <div className="relative w-full aspect-[16/10] bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-4 sm:p-6 flex flex-col sm:flex-row gap-3 overflow-hidden">
+      <div className="relative w-full aspect-[21/10] bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-3 sm:p-5 flex flex-col sm:flex-row gap-3 overflow-hidden">
         
-        {/* Drawing Room Zone */}
-        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col items-center justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+        {/* Drawing Room Zone (Waiting Area) */}
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
           <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
             DRAWING ROOM
           </span>
-          <div className="grid grid-cols-3 gap-3 z-10">
+          <div className="flex flex-wrap justify-center gap-3 z-10 w-full mt-4">
+            {/* Devices mixed with Assets dynamically */}
+            {renderAsset('sofa', 'Sofa', 's1')}
             {getRoomDevices('Drawing Room').map(renderDeviceButton)}
+            {renderAsset('coffee', 'Table', 'c1')}
+          </div>
+        </div>
+          
+        {/* Work Room 1 */}
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+          <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
+            WORK ROOM 1
+          </span>
+          <div className="flex flex-wrap justify-center gap-3 z-10 mt-4">
+            {renderAsset('desk', 'Desk', 'd1')}
+            {renderAsset('desk', 'Desk', 'd2')}
+            {getRoomDevices('Work Room 1').map(renderDeviceButton)}
+            {renderAsset('desk', 'Desk', 'd3')}
+            {renderAsset('desk', 'Desk', 'd4')}
           </div>
         </div>
 
-        {/* Work Room Combo Stack */}
-        <div className="flex-[1.4] flex flex-col gap-3">
-          
-          {/* Work Room 1 */}
-          <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex items-center justify-around bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
-            <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
-              WORK RM 1
-            </span>
-            <div className="grid grid-cols-5 gap-3 z-10">
-              {getRoomDevices('Work Room 1').map(renderDeviceButton)}
-            </div>
-          </div>
-
-          {/* Work Room 2 */}
-          <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex items-center justify-around bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
-            <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
-              WORK RM 2
-            </span>
-            <div className="grid grid-cols-5 gap-3 z-10">
-              {getRoomDevices('Work Room 2').map(renderDeviceButton)}
-            </div>
+        {/* Work Room 2 */}
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+          <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
+            WORK ROOM 2
+          </span>
+          <div className="flex flex-wrap justify-center gap-3 z-10 mt-4">
+            {renderAsset('desk', 'Desk', 'd5')}
+            {renderAsset('desk', 'Desk', 'd6')}
+            {getRoomDevices('Work Room 2').map(renderDeviceButton)}
+            {renderAsset('desk', 'Desk', 'd7')}
+            {renderAsset('desk', 'Desk', 'd8')}
           </div>
         </div>
 
