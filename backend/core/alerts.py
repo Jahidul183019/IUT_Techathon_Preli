@@ -12,6 +12,7 @@ Deduplication: the same alert condition won't fire again within a cooldown windo
 import uuid
 import logging
 from datetime import datetime, timezone, timedelta
+from core.time_utils import now_local
 
 from core.models import (
     Alert,
@@ -40,7 +41,7 @@ _cooldowns: dict[str, datetime] = {}
 def _is_work_hours(now: datetime | None = None) -> bool:
     """Check if current hour is within work hours."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = now_local()
     return WORK_HOUR_START <= now.hour < WORK_HOUR_END
 
 
@@ -76,7 +77,7 @@ def check_after_hours(now: datetime | None = None) -> list[Alert]:
     Fans are CRITICAL (fire hazard), lights are WARNING (wasteful).
     """
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = now_local()
 
     if _is_work_hours(now):
         return []  # No after-hours alerts during work hours
@@ -121,7 +122,7 @@ def check_continuous_full_room(now: datetime | None = None) -> list[Alert]:
     for at least 2 hours. This suggests someone forgot to turn things off.
     """
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = now_local()
 
     alerts: list[Alert] = []
 
@@ -175,7 +176,7 @@ def run_alert_checks(now: datetime | None = None) -> list[Alert]:
     Called by the simulator after each device state change.
     """
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = now_local()
 
     new_alerts: list[Alert] = []
     new_alerts.extend(check_after_hours(now))

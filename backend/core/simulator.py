@@ -18,7 +18,8 @@ import random
 import logging
 from datetime import datetime, timezone
 
-from core.models import DeviceType
+from core.time_utils import now_local
+from core.models import DeviceType, RoomId
 from core.store import device_store
 
 logger = logging.getLogger("simulator")
@@ -35,8 +36,8 @@ WORK_HOUR_END: int = 17            # 17:00
 # ── Time-weighted bias ─────────────────────────────────────────────────
 
 def _is_work_hours() -> bool:
-    """Check if current UTC hour falls within work hours."""
-    hour = datetime.now(timezone.utc).hour
+    """Check if current local hour falls within work hours."""
+    hour = now_local().hour
     return WORK_HOUR_START <= hour < WORK_HOUR_END
 
 
