@@ -10,6 +10,8 @@ The project is organized around a single backend state store in [backend/core/st
 * **Live dashboard**: React UI connected to [backend/main.py](backend/main.py) via `/ws`
 * **Discord bot**: Command responses from REST plus proactive alert polling in [bot/bot.py](bot/bot.py)
 
+For live deployment updates, check the backend on Render and the dashboard on Vercel.
+
 The architecture diagram is provided as both source and rendered output: [diagrams/architecture.dot](diagrams/architecture.dot), [diagrams/architecture.png](diagrams/architecture.png), and [diagrams/architecture.svg](diagrams/architecture.svg). The matching arrow reference table and regeneration instructions are in [diagrams/architecture.md](diagrams/architecture.md).
 
 For the conceptual ESP32 wiring, relay logic, ACS712 current sensing, and opto-isolated feedback, see [circuit/circuit_design.md](circuit/circuit_design.md).

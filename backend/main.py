@@ -11,6 +11,7 @@ Wires together:
 import asyncio
 import json
 import logging
+import os
 
 from contextlib import asynccontextmanager
 
@@ -132,10 +133,34 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ── CORS — allow dashboard (Vite dev server) and bot ──
+# ── CORS — allow dashboard (Vite dev server + Vercel deploy) and bot ──
+#
+# Origins come from the CORS_ALLOWED_ORIGINS env var (comma-separated).
+# When unset, we fall back to a sane default list that covers local dev
+# AND the canonical Vercel dashboard domain for this project.
+#
+# NOTE: We do NOT use allow_origins=["*"] because FastAPI refuses to
+# combine "*" with allow_credentials=True, which would silently block
+# the WebSocket "toggle" messages the dashboard sends.
+_default_origins = [
+    "http://localhost:5173",       # Vite dev server
+    "http://localhost:4173",       # Vite preview server
+    "http://127.0.0.1:5173",
+    "https://iot-smart-home-dashboard.vercel.app",  # Vercel production
+    "https://iot-smart-home-dashboard-git-main.vercel.app",  # Vercel preview
+]
+
+_env_origins = os.getenv("CORS_ALLOWED_ORIGINS", "").strip()
+if _env_origins:
+    _allowed_origins = [o.strip() for o in _env_origins.split(",") if o.strip()]
+else:
+    _allowed_origins = _default_origins
+
+logger.info("CORS allow-list: %s", _allowed_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

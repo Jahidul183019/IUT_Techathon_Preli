@@ -5,6 +5,9 @@ import AlertsPanel from './components/AlertsPanel';
 import OfficeLayout from './components/OfficeLayout';
 import './App.css';
 
+// Live hardware demo (Wokwi ESP32 simulation — see circuit/circuit_design.md)
+const WOKWI_DEMO_URL = 'https://wokwi.com/projects/468536088941998081';
+
 function App() {
   const { devices, usage, alerts, wsStatus, toggleDevice } = useDeviceSocket();
 
@@ -20,6 +23,17 @@ function App() {
           <p className="app-subtitle">Real-time IoT Dashboard</p>
         </div>
         <div className="header-right">
+          <a
+            className="wokwi-pill"
+            href={WOKWI_DEMO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open the ESP32 + relay + ACS712 circuit on Wokwi"
+          >
+            <span className="wokwi-icon" aria-hidden="true">🔌</span>
+            <span className="wokwi-label">View Live Hardware</span>
+            <span className="wokwi-ext" aria-hidden="true">↗</span>
+          </a>
           <div className={`ws-badge ${wsStatus}`}>
             <span className="ws-dot" />
             <span className="ws-label">{wsStatus}</span>
