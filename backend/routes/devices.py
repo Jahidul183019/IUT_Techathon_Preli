@@ -24,6 +24,9 @@ async def list_devices():
     return {
         "count": len(devices),
         "devices": [d.model_dump(mode="json") for d in devices],
+    }
+
+
 # ── GET /devices/contacts — dummy contacts ──────────────────────────
 
 @router.get("/contacts")
