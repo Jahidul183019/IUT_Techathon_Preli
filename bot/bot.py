@@ -7,12 +7,31 @@ Includes a background task to poll alerts and post them to a designated channel.
 
 import os
 import asyncio
+import threading
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 import httpx
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+def run_health_server():
+    class HealthHandler(SimpleHTTPRequestHandler):
+        def do_GET(self):
+            if self.path in ("/", "/health"):
+                self.send_response(200)
+                self.send_header("Content-type", "text/plain")
+                self.end_headers()
+                self.wfile.write(b"Bot is online and healthy")
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+    port = int(os.getenv("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    print(f"🏥 Health check server running on port {port}")
+    server.serve_forever()
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "")
 BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000")
@@ -117,6 +136,9 @@ if __name__ == "__main__":
     if not TOKEN:
         print("❌  DISCORD_BOT_TOKEN not set. Check your .env file.")
         exit(1)
+    
+    # Start the health check server in a background thread for Render Option A (Web Service)
+    threading.Thread(target=run_health_server, daemon=True).start()
     
     # Run the bot
     bot.run(TOKEN)
