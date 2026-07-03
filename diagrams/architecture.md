@@ -87,65 +87,7 @@ backend/
 
 ## Data Flow Diagram
 
-```mermaid
-graph TB
-    subgraph Backend["FastAPI Backend (Single Process)"]
-        SIM["Simulator Loop<br/>(async task, ticks every 3s)"]
-        STORE[("In-Memory Store<br/><b>Single Source of Truth</b>")]
-        ALERT["Alert Engine"]
-        REST["REST Routes"]
-        WS["WebSocket Hub"]
-    end
-
-    subgraph Devices["Simulated Devices (15)"]
-        DR["Drawing Room<br/>2 fans + 3 lights"]
-        WR1["Work Room 1<br/>2 fans + 3 lights"]
-        WR2["Work Room 2<br/>2 fans + 3 lights"]
-    end
-
-    subgraph Clients["Consumer Interfaces"]
-        DASH["React Dashboard<br/>(Vite)"]
-        BOT["Discord Bot<br/>(discord.py)"]
-    end
-
-    %% Simulator flow
-    SIM -- "random flip / adjust" --> STORE
-    STORE -- "new reading" --> ALERT
-    ALERT -- "alert object" --> STORE
-    SIM -- "device_update via WS" --> WS
-    ALERT -- "alert via WS" --> WS
-
-    %% Device simulation is internal
-    DR -. "simulated in" .-> SIM
-    WR1 -. "simulated in" .-> SIM
-    WR2 -. "simulated in" .-> SIM
-
-    %% Dashboard
-    DASH -- "toggle via WS" --> WS
-    WS -- "snapshot via WS" --> DASH
-    WS -- "device_update via WS" --> DASH
-    WS -- "alert via WS" --> DASH
-    DASH -- "GET /api/usage via HTTP" --> REST
-    REST -- "JSON response via HTTP" --> DASH
-
-    %% Bot
-    BOT -- "GET /api/devices via HTTP" --> REST
-    BOT -- "POST /api/devices/:id/toggle via HTTP" --> REST
-    BOT -- "GET /api/usage via HTTP" --> REST
-    REST -- "JSON response via HTTP" --> BOT
-    WS -- "device_update via WS" --> BOT
-    WS -- "alert via WS" --> BOT
-
-    %% Store serves REST
-    REST -- "read" --> STORE
-    WS -- "toggle → mutate" --> STORE
-
-    style STORE fill:#f59e0b,stroke:#d97706,color:#000
-    style WS fill:#38bdf8,stroke:#0284c7,color:#000
-    style REST fill:#a78bfa,stroke:#7c3aed,color:#000
-    style SIM fill:#34d399,stroke:#059669,color:#000
-    style ALERT fill:#f87171,stroke:#dc2626,color:#000
-```
+[Note: Mermaid diagram removed to comply with hackathon rules. Please use the "Labelled Arrow Reference" table below to manually draw this in Excalidraw or draw.io as requested by the problem statement.]
 
 ---
 
@@ -210,51 +152,8 @@ Use this table to draw each arrow precisely:
 
 ## Sequence: User Toggles a Device from Dashboard
 
-```mermaid
-sequenceDiagram
-    participant D as React Dashboard
-    participant WS as WebSocket Hub
-    participant S as In-Memory Store
-    participant A as Alert Engine
-    participant B as Discord Bot
-
-    D->>WS: {"event": "toggle", "data": {"device_id": "dr_fan_1"}}
-    WS->>S: store.toggle("dr_fan_1")
-    S-->>WS: updated device object
-    S->>A: check_thresholds(device)
-    alt Threshold breached
-        A->>S: store.add_alert(alert)
-        A-->>WS: broadcast alert
-        WS-->>D: {"event": "alert", ...}
-        WS-->>B: {"event": "alert", ...}
-    end
-    WS-->>D: {"event": "device_update", "data": {...}}
-    WS-->>B: {"event": "device_update", "data": {...}}
-    Note over D,B: Both clients receive the same update simultaneously
-```
+[Note: Sequence diagram removed to comply with hackathon rules. See the text description above.]
 
 ## Sequence: Simulator Auto-Flips a Device
 
-```mermaid
-sequenceDiagram
-    participant SIM as Simulator Loop
-    participant S as In-Memory Store
-    participant A as Alert Engine
-    participant WS as WebSocket Hub
-    participant D as React Dashboard
-    participant B as Discord Bot
-
-    loop Every 3 seconds
-        SIM->>S: pick random device, flip state
-        S->>A: check_thresholds(device)
-        alt Alert triggered
-            A->>S: store.add_alert(alert)
-            A-->>WS: broadcast("alert", alert_data)
-            WS-->>D: {"event": "alert", ...}
-            WS-->>B: {"event": "alert", ...}
-        end
-        SIM-->>WS: broadcast("device_update", device_data)
-        WS-->>D: {"event": "device_update", ...}
-        WS-->>B: {"event": "device_update", ...}
-    end
-```
+[Note: Sequence diagram removed to comply with hackathon rules. See the text description above.]
