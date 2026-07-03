@@ -19,7 +19,7 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
       <button
         key={device.id}
         onClick={() => onToggleDevice(device.id)}
-        className={`h-12 min-w-12 px-2 rounded-lg transition-all active:scale-90 duration-100 flex flex-col items-center justify-center border ${
+        className={`aspect-square w-full rounded-lg transition-all active:scale-90 duration-100 flex flex-col items-center justify-center border ${
           isOn
             ? 'text-secondary glow-active bg-secondary/5 border-secondary/40'
             : 'text-on-surface-variant hover:text-on-surface bg-surface-container-low/40 border-outline-variant/40'
@@ -27,7 +27,7 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
         title={`${device.name}: ${device.status} (${isOn ? device.currentDraw : 0}W)`}
       >
         <Icon className={`w-5 h-5 ${device.type === 'fan' && isOn ? 'animate-spin-slow' : ''}`} />
-        <span className="mt-1 max-w-14 truncate font-mono text-[8px] uppercase">
+        <span className="mt-1 w-[90%] truncate font-mono text-[8px] uppercase">
           {device.type === 'fan' ? 'Fan' : 'Light'}
         </span>
       </button>
@@ -37,7 +37,7 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
   const renderAsset = (type: 'desk' | 'sofa' | 'coffee', label: string, keyId: string) => (
     <div
       key={keyId}
-      className="h-12 min-w-12 px-2 rounded-lg border border-outline-variant/20 bg-surface-container-lowest/30 flex flex-col items-center justify-center text-outline/40 pointer-events-none"
+      className="aspect-square w-full rounded-lg border border-outline-variant/20 bg-surface-container-lowest/30 flex flex-col items-center justify-center text-outline/40 pointer-events-none"
     >
       {type === 'desk' && <Monitor className="w-4 h-4 mb-1" />}
       {type === 'sofa' && <Armchair className="w-4 h-4 mb-1" />}
@@ -55,14 +55,14 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
       </div>
 
       {/* Grid Blueprint Floor Plan */}
-      <div className="relative w-full aspect-[21/10] bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-3 sm:p-5 flex flex-col sm:flex-row gap-3 overflow-hidden">
+      <div className="relative w-full min-h-[300px] bg-surface-container-lowest rounded-lg border border-outline-variant/30 p-3 sm:p-5 flex flex-col sm:flex-row gap-3 overflow-hidden">
         
         {/* Drawing Room Zone (Waiting Area) */}
-        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col items-center justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
           <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
             DRAWING ROOM
           </span>
-          <div className="flex flex-wrap justify-center gap-3 z-10 w-full mt-4">
+          <div className="grid grid-cols-3 gap-2 z-10 w-full mt-4 max-w-[200px]">
             {/* Devices mixed with Assets dynamically */}
             {renderAsset('sofa', 'Sofa', 's1')}
             {getRoomDevices('Drawing Room').map(renderDeviceButton)}
@@ -71,11 +71,11 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
         </div>
           
         {/* Work Room 1 */}
-        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col items-center justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
           <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
             WORK ROOM 1
           </span>
-          <div className="flex flex-wrap justify-center gap-3 z-10 mt-4">
+          <div className="grid grid-cols-3 gap-2 z-10 w-full mt-4 max-w-[200px]">
             {renderAsset('desk', 'Desk', 'd1')}
             {renderAsset('desk', 'Desk', 'd2')}
             {getRoomDevices('Work Room 1').map(renderDeviceButton)}
@@ -85,11 +85,11 @@ export default function OfficeFloorplan({ devices, onToggleDevice }: OfficeFloor
         </div>
 
         {/* Work Room 2 */}
-        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
+        <div className="flex-1 border-2 border-dashed border-outline-variant/60 rounded-lg p-3 relative flex flex-col items-center justify-center bg-surface-container/15 group/room transition-colors hover:bg-surface-container/20">
           <span className="absolute top-2 left-2 font-mono text-[9px] text-outline/60 tracking-wider">
             WORK ROOM 2
           </span>
-          <div className="flex flex-wrap justify-center gap-3 z-10 mt-4">
+          <div className="grid grid-cols-3 gap-2 z-10 w-full mt-4 max-w-[200px]">
             {renderAsset('desk', 'Desk', 'd5')}
             {renderAsset('desk', 'Desk', 'd6')}
             {getRoomDevices('Work Room 2').map(renderDeviceButton)}
