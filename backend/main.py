@@ -143,6 +143,8 @@ app = FastAPI(
 # combine "*" with allow_credentials=True, which would silently block
 # the WebSocket "toggle" messages the dashboard sends.
 _default_origins = [
+    "http://localhost:3000",       # New Vite frontend
+    "http://127.0.0.1:3000",
     "http://localhost:5173",       # Vite dev server
     "http://localhost:4173",       # Vite preview server
     "http://127.0.0.1:5173",

@@ -1,0 +1,6 @@
+{
+  "name": "AetherOS IoT",
+  "description": "An interactive, high-density office dashboard featuring live power insights, an interactive office floorplan, real-time alert logs, and comprehensive device controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
