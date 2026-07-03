@@ -8,6 +8,26 @@ interface SupportModalProps {
 }
 
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
+  const [contacts, setContacts] = React.useState<{name: string, email: string, phone: string}[]>([]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const fetchContacts = async () => {
+        try {
+          const API_URL = import.meta.env.VITE_API_URL || 'https://iot-smart-home-backend-8au0.onrender.com';
+          const res = await fetch(`${API_URL}/api/devices/contacts`);
+          if (res.ok) {
+            const data = await res.json();
+            setContacts(data.contacts || []);
+          }
+        } catch (e) {
+          console.error('Failed to fetch contacts', e);
+        }
+      };
+      fetchContacts();
+    }
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -44,11 +64,26 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                 <p className="font-mono text-xs uppercase text-primary font-bold">Node Diagnostics Information</p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono text-on-surface-variant">
                   <div>System ID: <span className="text-on-surface">SMART-HOME-MONITOR-01</span></div>
-                  <div>Deployment: <span className="text-on-surface">Local Network</span></div>
+                  <div>Deployment: <span className="text-on-surface">{import.meta.env.MODE === 'development' ? 'Local Network' : 'Production Cloud'}</span></div>
                   <div>UI Version: <span className="text-on-surface">v1.0.0</span></div>
-                  <div>Admin: <span className="text-on-surface">admin@localhost</span></div>
+                  <div>Admin: <span className="text-on-surface">{contacts.length > 0 ? contacts[0].email : 'admin@localhost'}</span></div>
                 </div>
               </div>
+
+              {/* Dynamic Contacts */}
+              {contacts.length > 0 && (
+                <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2">
+                  <p className="font-mono text-xs uppercase text-primary font-bold">Support Contacts</p>
+                  <div className="space-y-2">
+                    {contacts.map((c, i) => (
+                      <div key={i} className="text-xs font-mono text-on-surface-variant flex justify-between">
+                        <span className="text-on-surface font-bold">{c.name}</span>
+                        <span>{c.phone}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Troubleshooting Q&A */}
               <div className="space-y-3">
@@ -77,7 +112,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                   <PhoneCall className="w-4 h-4 text-primary" /> Contact Admin
                 </a>
                 <a
-                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/docs`}
+                  href={`${import.meta.env.VITE_API_URL || 'https://iot-smart-home-backend-8au0.onrender.com'}/docs`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-primary text-on-primary hover:brightness-110 rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all"
