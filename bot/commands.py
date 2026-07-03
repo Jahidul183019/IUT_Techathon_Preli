@@ -8,21 +8,29 @@ import json
 import httpx
 from discord.ext import commands
 from groq import AsyncGroq
+import google.generativeai as genai
 
 BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY_1 = os.getenv("GROQ_API_KEY_1", "")
+GROQ_API_KEY_2 = os.getenv("GROQ_API_KEY_2", "")
+GROQ_API_KEY_3 = os.getenv("GROQ_API_KEY_3", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-# Initialize Groq client if key is provided
-groq_client = AsyncGroq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+# Initialize Groq clients if keys are provided
+groq_clients = []
+for key in [GROQ_API_KEY_1, GROQ_API_KEY_2, GROQ_API_KEY_3]:
+    if key:
+        groq_clients.append(AsyncGroq(api_key=key))
+
+# Configure Gemini if key is provided
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 async def generate_response(data: dict, command: str, fallback: str) -> str:
     """
-    Calls the Groq API to rewrite raw data into a friendly response.
-    Falls back to the provided formatted string if API fails or is not configured.
+    Calls the Groq API (with 3 key fallback) or Gemini API to rewrite raw data into a friendly response.
+    Falls back to the provided formatted string if all APIs fail or are not configured.
     """
-    if not groq_client:
-        return fallback
-        
     system_prompt = (
         "You are a friendly office assistant helping a busy boss monitor office devices. "
         "Keep responses under 3 sentences, conversational, and helpful. "
@@ -31,20 +39,37 @@ async def generate_response(data: dict, command: str, fallback: str) -> str:
     
     user_prompt = f"Here is the current office status data: {json.dumps(data)}. Summarize this for the boss in response to the command: {command}"
     
-    try:
-        chat_completion = await groq_client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            model="llama3-8b-8192",
-            temperature=0.7,
-            max_tokens=150,
-        )
-        return chat_completion.choices[0].message.content
-    except Exception as e:
-        print(f"Groq API error: {e}")
-        return fallback
+    # Try Gemini API first
+    if GEMINI_API_KEY:
+        try:
+            model = genai.GenerativeModel(
+                model_name='gemini-1.5-flash',
+                system_instruction=system_prompt
+            )
+            response = await model.generate_content_async(user_prompt)
+            return response.text
+        except Exception as e:
+            print(f"Gemini API error: {e}")
+
+    # Try Groq clients if Gemini fails or is not configured
+    for client in groq_clients:
+        try:
+            chat_completion = await client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                model="llama3-8b-8192",
+                temperature=0.7,
+                max_tokens=150,
+            )
+            return chat_completion.choices[0].message.content
+        except Exception as e:
+            print(f"Groq API error with a client: {e}")
+            continue
+
+    # If everything fails, use fallback
+    return fallback
 
 class DeviceCommands(commands.Cog):
     """Commands for interacting with the Smart Home system."""
