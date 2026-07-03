@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, HelpCircle, FileText, Settings, PhoneCall, ShieldAlert } from 'lucide-react';
+import { X, HelpCircle, FileText, Settings, PhoneCall, ShieldAlert, ServerCog } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SupportModalProps {
