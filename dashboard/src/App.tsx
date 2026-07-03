@@ -39,6 +39,7 @@ export default function App() {
   const activeNodesCount = usage?.active_devices ?? devices.filter((d) => d.status === 'ON').length;
   const totalNodesCount = usage?.total_devices ?? devices.length;
   const estKwhToday = usage?.estimated_kwh_today ?? 0;
+  const roomNamesList = usage?.rooms.map(r => r.room_name).join(', ') ?? 'Drawing Room, Work Room 1, Work Room 2';
 
   // Action: Toggle a device state ON/OFF
   const handleToggleDevice = (deviceId: string) => {
@@ -257,6 +258,7 @@ export default function App() {
         onClose={() => setIsLogsModalOpen(false)}
         activeLoad={activeLoad}
         deviceCount={totalNodesCount}
+        roomNames={roomNamesList}
       />
     </div>
   );

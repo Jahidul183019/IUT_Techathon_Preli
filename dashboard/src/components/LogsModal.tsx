@@ -7,9 +7,10 @@ interface LogsModalProps {
   onClose: () => void;
   activeLoad: number;
   deviceCount: number;
+  roomNames: string;
 }
 
-export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount }: LogsModalProps) {
+export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount, roomNames }: LogsModalProps) {
   const [terminalLines, setTerminalLines] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -19,7 +20,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount }: 
     `Connecting to live gateway broker at ${import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws'}... [CONNECTED]`,
     'Syncing office layout matrices... done.',
     'Restoring live hardware configurations from FastAPI backend... [SUCCESS]',
-    'Monitoring active relays in rooms: [Drawing Room, Work Room 1, Work Room 2]',
+    `Monitoring active relays in rooms: [${roomNames}]`,
   ];
 
   useEffect(() => {
@@ -65,7 +66,8 @@ export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount }: 
     } else if (cmd === 'ping') {
       response = `[${timestamp}] 64 bytes from 10.0.12.8: icmp_seq=1 ttl=64 time=12.4 ms`;
     } else if (cmd === 'diagnose') {
-      response = `[${timestamp}] running full hardware self-test...\n -> Drawing Room nodes: NOMINAL\n -> Work Room 1 nodes: NOMINAL\n -> Work Room 2 nodes: NOMINAL`;
+      const roomTestLines = roomNames.split(', ').map(r => ` -> ${r} nodes: NOMINAL`).join('\n');
+      response = `[${timestamp}] running full hardware self-test...\n${roomTestLines}`;
     }
 
     setTerminalLines((prev) => [...prev, `admin@iot-dashboard:~$ ${inputValue}`, response]);
