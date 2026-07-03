@@ -6,9 +6,10 @@ interface LogsModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeLoad: number;
+  deviceCount: number;
 }
 
-export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProps) {
+export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount }: LogsModalProps) {
   const [terminalLines, setTerminalLines] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -35,7 +36,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
       const loadStr = `${activeLoad}W`;
       const heartbeats = [
         `[${timestamp}] sys-mon: heartbeat OK. current_cumulative_load=${loadStr}`,
-        `[${timestamp}] gateway: synchronized 15 physical nodes with broker`,
+        `[${timestamp}] gateway: synchronized ${deviceCount} physical nodes with broker`,
         `[${timestamp}] relay-service: polling sensor states... no issues detected`,
       ];
       const randomLine = heartbeats[Math.floor(Math.random() * heartbeats.length)];
@@ -43,7 +44,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isOpen, activeLoad]);
+  }, [isOpen, activeLoad, deviceCount]);
 
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +61,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
       setInputValue('');
       return;
     } else if (cmd === 'status') {
-      response = `[${timestamp}] system_uptime=86402s, connected_nodes=15, load_index=${activeLoad}W`;
+      response = `[${timestamp}] system_uptime=86402s, connected_nodes=${deviceCount}, load_index=${activeLoad}W`;
     } else if (cmd === 'ping') {
       response = `[${timestamp}] 64 bytes from 10.0.12.8: icmp_seq=1 ttl=64 time=12.4 ms`;
     } else if (cmd === 'diagnose') {

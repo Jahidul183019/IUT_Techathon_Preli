@@ -51,7 +51,7 @@ export default function App() {
   const handleAddDevice = (newDevice: Omit<Device, 'id' | 'lastActivity' | 'currentDraw'>) => {
     triggerCustomAlert(
       'info',
-      `Device "${newDevice.name}" was not added. The FastAPI backend uses a fixed 15-device hackathon inventory.`,
+      `Device "${newDevice.name}" was not added. The backend currently uses a fixed ${totalNodesCount}-device inventory.`,
     );
   };
 
@@ -256,6 +256,7 @@ export default function App() {
         isOpen={isLogsModalOpen}
         onClose={() => setIsLogsModalOpen(false)}
         activeLoad={activeLoad}
+        deviceCount={totalNodesCount}
       />
     </div>
   );
