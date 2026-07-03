@@ -10,7 +10,7 @@ The project is organized around a single backend state store in [backend/core/st
 * **Live dashboard**: React UI connected to [backend/main.py](backend/main.py) via `/ws`
 * **Discord bot**: Command responses from REST plus proactive alert polling in [bot/bot.py](bot/bot.py)
 
-For live deployment updates, check the backend on Render and the dashboard on Vercel.
+For live deployment updates, check the deployed Backend at [Render](https://iot-smart-home-backend-8au0.onrender.com/) and the dashboard on Vercel.
 
 The architecture diagram is provided as both source and rendered output: [diagrams/architecture.dot](diagrams/architecture.dot), [diagrams/architecture.png](diagrams/architecture.png), and [diagrams/architecture.svg](diagrams/architecture.svg). The matching arrow reference table and regeneration instructions are in [diagrams/architecture.md](diagrams/architecture.md).
 
@@ -128,3 +128,25 @@ A 3-minute walkthrough is included with the submission link. It demonstrates:
 6. A short tour of the architecture diagram and circuit design
 
 ---
+
+## Engineering Process
+
+As required by the problem statement, here is an outline of the engineering decisions behind the significant features of this system:
+
+### 1. Simulated Device Layer & Backend
+- **Assumptions**: The system requires simulating 15 devices across 3 rooms (2 fans + 3 lights per room). The backend must serve as the single source of truth for both the dashboard and the Discord bot.
+- **Implementation Plan**: Built with FastAPI. A background async simulator randomly toggles devices based on time-of-day probabilities to simulate activity. State is kept in a centralized in-memory `device_store`.
+- **Trade-offs**: An in-memory store is fast and easy to set up without external dependencies, but state is lost on restart. Given the hackathon simulation requirements, this is a pragmatic trade-off over configuring a full PostgreSQL/Redis database.
+- **Validation Approach**: Verified via REST API endpoints and ensuring both the dashboard and Discord bot always reflect identical state changes in real-time.
+
+### 2. Live Web Dashboard
+- **Assumptions**: The dashboard needs to reflect real-time updates without manual page refreshes, display an active alerts panel, and visually represent device states.
+- **Implementation Plan**: Built with React (Vite). Uses WebSockets to connect to the FastAPI backend, listening for instant `device_update` and `alert` events.
+- **Trade-offs**: WebSockets require persistent connections, which can be slightly more complex to deploy and scale than simple HTTP polling. However, it perfectly meets the "no manual refresh" requirement with much lower latency and network overhead.
+- **Validation Approach**: Tested by opening multiple dashboard tabs; toggling a device in one instantly reflects the state change across all open tabs.
+
+### 3. Discord Bot
+- **Assumptions**: The bot needs to fetch live data from the shared backend and proactively notify a channel when alerts occur. It should respond conversationally.
+- **Implementation Plan**: Built with `discord.py`. Uses REST API calls (`/api/devices`, `/api/alerts`) for responding to commands (`!status`, `!usage`, `!room`). A background task polls the backend for new alerts. LLM-generated friendly responses (via Groq API) are used to humanize the bot.
+- **Trade-offs**: Polling for alerts (instead of using WebSockets for the bot) simplifies the bot architecture and avoids managing multiple persistent connection paradigms, though it introduces a slight delay in proactive alerts.
+- **Validation Approach**: Tested commands in Discord to verify they fetch correct data from the backend. Triggered alert conditions in the backend and verified the bot proactively posts to the designated channel.
