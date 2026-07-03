@@ -150,6 +150,7 @@ _default_origins = [
     "http://127.0.0.1:5173",
     "https://iot-smart-home-dashboard.vercel.app",  # Vercel production
     "https://iot-smart-home-dashboard-git-main.vercel.app",  # Vercel preview
+    "https://iot-smart-home-dashboard.onrender.com",  # Render production
 ]
 
 _env_origins = os.getenv("CORS_ALLOWED_ORIGINS", "").strip()
