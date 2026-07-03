@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, ConnectionStatus, Device, UsageStats } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+const API_URL = import.meta.env.VITE_API_URL || 'https://iot-smart-home-dashboard.onrender.com';
+const WS_URL = import.meta.env.VITE_WS_URL || 'wss://iot-smart-home-dashboard.onrender.com/ws';
 
 const ROOM_NAMES = {
   drawing_room: 'Drawing Room',

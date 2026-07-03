@@ -13,12 +13,12 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
   const [inputValue, setInputValue] = useState<string>('');
 
   const bootLogs = [
-    'Initializing office monitoring shell...',
-    'Starting telemetry services... [OK]',
-    'Connecting to shared backend snapshot stream... [CONNECTED]',
-    'Syncing room inventory and usage metrics... done.',
-    'Restoring dashboard session state... [SUCCESS]',
-    'Monitoring active devices in rooms: [Drawing Room, Work Room 1, Work Room 2]',
+    'Initializing Smart Home IoT Monitor...',
+    'Starting backend supervisor services... [OK]',
+    `Connecting to live gateway broker at ${import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws'}... [CONNECTED]`,
+    'Syncing office layout matrices... done.',
+    'Restoring live hardware configurations from FastAPI backend... [SUCCESS]',
+    'Monitoring active relays in rooms: [Drawing Room, Work Room 1, Work Room 2]',
   ];
 
   useEffect(() => {
@@ -34,9 +34,9 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
       const timestamp = new Date().toLocaleTimeString();
       const loadStr = `${activeLoad}W`;
       const heartbeats = [
-        `[${timestamp}] monitor: heartbeat OK. current_cumulative_load=${loadStr}`,
-        `[${timestamp}] backend: synchronized 15 devices with live store`,
-        `[${timestamp}] dashboard: polling device states... no issues detected`,
+        `[${timestamp}] sys-mon: heartbeat OK. current_cumulative_load=${loadStr}`,
+        `[${timestamp}] gateway: synchronized 15 physical nodes with broker`,
+        `[${timestamp}] relay-service: polling sensor states... no issues detected`,
       ];
       const randomLine = heartbeats[Math.floor(Math.random() * heartbeats.length)];
       setTerminalLines((prev) => [...prev, randomLine]);
@@ -60,14 +60,14 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
       setInputValue('');
       return;
     } else if (cmd === 'status') {
-      response = `[${timestamp}] connected_rooms=3, total_devices=15, load_index=${activeLoad}W`;
+      response = `[${timestamp}] system_uptime=86402s, connected_nodes=15, load_index=${activeLoad}W`;
     } else if (cmd === 'ping') {
-      response = `[${timestamp}] backend heartbeat acknowledged: websocket stream healthy`;
+      response = `[${timestamp}] 64 bytes from 10.0.12.8: icmp_seq=1 ttl=64 time=12.4 ms`;
     } else if (cmd === 'diagnose') {
-      response = `[${timestamp}] running dashboard self-test...\n -> Drawing Room devices: NOMINAL\n -> Work Room 1 devices: NOMINAL\n -> Work Room 2 devices: NOMINAL`;
+      response = `[${timestamp}] running full hardware self-test...\n -> Drawing Room nodes: NOMINAL\n -> Work Room 1 nodes: NOMINAL\n -> Work Room 2 nodes: NOMINAL`;
     }
 
-    setTerminalLines((prev) => [...prev, `office-monitor:~$ ${inputValue}`, response]);
+    setTerminalLines((prev) => [...prev, `admin@iot-dashboard:~$ ${inputValue}`, response]);
     setInputValue('');
   };
 
@@ -99,7 +99,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
                 </div>
                 <div className="h-4 w-[1px] bg-outline-variant/50 mx-1" />
                 <h3 className="font-mono text-xs text-on-surface-variant flex items-center gap-1.5">
-                  <Terminal className="w-4 h-4 text-secondary" /> office-monitor:~
+                  <Terminal className="w-4 h-4 text-secondary" /> admin@iot-dashboard:~
                 </h3>
               </div>
               <button
@@ -121,7 +121,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad }: LogsModalProp
 
             {/* Prompt input */}
             <form onSubmit={handleCommandSubmit} className="mt-3 flex items-center gap-2 bg-[#07090e] border border-outline-variant/20 rounded-lg px-3 py-2">
-              <span className="font-mono text-xs text-primary shrink-0">office-monitor:~$</span>
+              <span className="font-mono text-xs text-primary shrink-0">admin@iot-dashboard:~$</span>
               <input
                 type="text"
                 value={inputValue}

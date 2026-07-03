@@ -7,17 +7,6 @@ interface SupportModalProps {
   onClose: () => void;
 }
 
-const supportCenterName = import.meta.env.VITE_SUPPORT_CENTER_NAME || 'Support Center';
-const gridId = import.meta.env.VITE_GRID_ID || 'Not configured';
-const coordinates = import.meta.env.VITE_GRID_COORDINATES || 'Not configured';
-const firmwareVersion = import.meta.env.VITE_FIRMWARE_VERSION || 'Smart Home Monitor UI';
-const supervisorEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'Not configured';
-const hotlineNumber = import.meta.env.VITE_SUPPORT_PHONE || '';
-const hotlineLabel = import.meta.env.VITE_SUPPORT_PHONE_LABEL || 'Contact Support';
-const apiDocsUrl =
-  import.meta.env.VITE_API_DOCS_URL ||
-  `${(import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/docs`;
-
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
   return (
     <AnimatePresence>
@@ -39,7 +28,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
           >
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-outline-variant/50">
               <h3 className="font-sans font-bold text-lg text-primary flex items-center gap-2">
-                <HelpCircle className="w-5 h-5" /> {supportCenterName}
+                <HelpCircle className="w-5 h-5" /> System Information & Support
               </h3>
               <button
                 onClick={onClose}
@@ -52,20 +41,12 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
             <div className="space-y-4 text-sm leading-relaxed">
               {/* Operational details */}
               <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2">
-                <p className="font-mono text-xs uppercase text-primary font-bold">Support Diagnostics Information</p>
+                <p className="font-mono text-xs uppercase text-primary font-bold">Node Diagnostics Information</p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono text-on-surface-variant">
-                  <div>
-                    Grid ID: <span className="text-on-surface">{gridId}</span>
-                  </div>
-                  <div>
-                    Coordinates: <span className="text-on-surface">{coordinates}</span>
-                  </div>
-                  <div>
-                    UI Version: <span className="text-on-surface">{firmwareVersion}</span>
-                  </div>
-                  <div>
-                    Contact: <span className="text-on-surface">{supervisorEmail}</span>
-                  </div>
+                  <div>System ID: <span className="text-on-surface">SMART-HOME-MONITOR-01</span></div>
+                  <div>Deployment: <span className="text-on-surface">Local Network</span></div>
+                  <div>UI Version: <span className="text-on-surface">v1.0.0</span></div>
+                  <div>Admin: <span className="text-on-surface">admin@localhost</span></div>
                 </div>
               </div>
 
@@ -75,33 +56,28 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                 
                 <div className="space-y-2">
                   <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
-                    <p className="font-bold text-xs flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5 text-tertiary" /> Critical alert is active?</p>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">Use the dashboard or floorplan to toggle high-load devices off, then verify the alert clears once combined usage drops below the configured limit.</p>
+                    <p className="font-bold text-xs flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5 text-tertiary" /> Critical alert about "AC Overload" is active?</p>
+                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">This triggers when active workroom nodes exceed 1000W of combined power draw. To clear, simply toggle off high-load devices on your dashboard or floorplan.</p>
                   </div>
 
                   <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
-                    <p className="font-bold text-xs flex items-center gap-1.5"><Settings className="w-3.5 h-3.5 text-primary" /> How do I add a custom device?</p>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">Click the Add Device button in the sidebar. Choose the room, type, and wattage to integrate it into the floorplan and energy views.</p>
+                    <p className="font-bold text-xs flex items-center gap-1.5"><Settings className="w-3.5 h-3.5 text-primary" /> How do I map a custom IoT node?</p>
+                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">Click the "Add Device" button on the left workspace panel. Configure the room, type, and wattage ratings to integrate it instantly into floorplans and energy bar indices.</p>
                   </div>
                 </div>
               </div>
 
               {/* Support Hotline info */}
               <div className="flex gap-4 pt-2 border-t border-outline-variant/50">
-                {hotlineNumber ? (
-                  <a
-                    href={`tel:${hotlineNumber}`}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-surface-variant hover:bg-surface-container-high border border-outline-variant rounded-lg text-xs font-mono uppercase tracking-wider transition-colors"
-                  >
-                    <PhoneCall className="w-4 h-4 text-primary" /> {hotlineLabel}
-                  </a>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center gap-2 py-2 bg-surface-variant border border-outline-variant rounded-lg text-xs font-mono uppercase tracking-wider text-on-surface-variant">
-                    <PhoneCall className="w-4 h-4 text-outline" /> {hotlineLabel}: Not configured
-                  </div>
-                )}
                 <a
-                  href={apiDocsUrl}
+                  href="#"
+                  onClick={(e) => e.preventDefault()}
+                  className="flex-1 flex items-center justify-center gap-2 py-2 bg-surface-variant hover:bg-surface-container-high border border-outline-variant rounded-lg text-xs font-mono uppercase tracking-wider transition-colors"
+                >
+                  <PhoneCall className="w-4 h-4 text-primary" /> Contact Admin
+                </a>
+                <a
+                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/docs`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-primary text-on-primary hover:brightness-110 rounded-lg text-xs font-mono font-bold uppercase tracking-wider transition-all"
