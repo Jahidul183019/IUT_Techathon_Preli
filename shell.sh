@@ -10,8 +10,8 @@ BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_HOST="${FRONTEND_HOST:-0.0.0.0}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 
-export VITE_API_URL="${VITE_API_URL:-https://iot-smart-home-dashboard.onrender.com}"
-export VITE_WS_URL="${VITE_WS_URL:-wss://iot-smart-home-dashboard.onrender.com/ws}"
+export VITE_API_URL="${VITE_API_URL:-http://localhost:$BACKEND_PORT}"
+export VITE_WS_URL="${VITE_WS_URL:-ws://localhost:$BACKEND_PORT/ws}"
 
 BACKEND_PID=""
 FRONTEND_PID=""
