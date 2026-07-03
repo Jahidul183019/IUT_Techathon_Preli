@@ -8,7 +8,7 @@ interface SupportModalProps {
 }
 
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
-  const [contacts, setContacts] = React.useState<{name: string, email: string, phone: string}[]>([]);
+  const [contacts, setContacts] = React.useState<{ name: string, email: string, phone: string }[]>([]);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -64,7 +64,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                 <p className="font-mono text-xs uppercase text-primary font-bold">Node Diagnostics Information</p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono text-on-surface-variant">
                   <div>System ID: <span className="text-on-surface">SMART-HOME-MONITOR-01</span></div>
-                  <div>Deployment: <span className="text-on-surface">{import.meta.env.MODE === 'development' ? 'Local Network' : 'Production Cloud'}</span></div>
+                  <div>Deployment: <span className="text-on-surface">Local Network</span></div>
                   <div>UI Version: <span className="text-on-surface">v1.0.0</span></div>
                   <div>Admin: <span className="text-on-surface">{contacts.length > 0 ? contacts[0].email : 'admin@localhost'}</span></div>
                 </div>
@@ -88,7 +88,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
               {/* Troubleshooting Q&A */}
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase text-on-surface-variant font-bold tracking-wider">Troubleshooting FAQ</p>
-                
+
                 <div className="space-y-2">
                   <div className="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/20">
                     <p className="font-bold text-xs flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5 text-tertiary" /> Critical alert about "AC Overload" is active?</p>

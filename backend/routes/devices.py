@@ -36,7 +36,7 @@ async def get_contacts():
         "contacts": [
             { "name": "Nafisa Rahman", "email": "nafisa.rahman@yahoo.com", "phone": "+8801812345678" },
             { "name": "Tanvir Hossain", "email": "tanvir.hossain@yahoo.com", "phone": "+8801912345678" }
-        ]
+
     }
 
 
