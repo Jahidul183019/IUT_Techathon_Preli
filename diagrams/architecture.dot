@@ -1,0 +1,117 @@
+// IoT Smart Home Monitor — System Architecture
+// Renders the full data flow from the 16-row "Labelled Arrow Reference" table
+// in diagrams/architecture.md. Run with:
+//   dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
+//   dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
+
+digraph Architecture {
+    // ── Layout ──────────────────────────────────────────────────────
+    rankdir=LR;
+    splines=polyline;
+    nodesep=0.55;
+    ranksep=1.2;
+    bgcolor="white";
+    fontname="Helvetica";
+    label="IoT Smart Home Monitor — System Architecture\nData flow: 15 simulated devices → backend → dashboard + Discord bot";
+    labelloc="t";
+    fontsize=18;
+    fontcolor="#1f2937";
+
+    // ── Default node style ──────────────────────────────────────────
+    node [
+        shape=box,
+        style="rounded,filled",
+        fontname="Helvetica",
+        fontsize=12,
+        color="#475569",
+        penwidth=1.5,
+    ];
+
+    // ── Default edge style ──────────────────────────────────────────
+    edge [
+        fontname="Helvetica",
+        fontsize=9,
+        color="#475569",
+        penwidth=1.2,
+        arrowsize=0.7,
+    ];
+
+    // ── Cluster: Device / Sim layer ────────────────────────────────
+    subgraph cluster_device {
+        label="Device / Simulated Data Layer";
+        style="rounded,filled";
+        fillcolor="#fef3c7";
+        color="#f59e0b";
+        fontcolor="#92400e";
+        fontsize=13;
+
+        SIM [label="Simulator Loop\n(asyncio task)\nbackend/core/simulator.py",
+             fillcolor="#fde68a"];
+    }
+
+    // ── Cluster: Backend (Single Source of Truth) ───────────────────
+    subgraph cluster_backend {
+        label="FastAPI Backend  (Single Source of Truth)";
+        style="rounded,filled";
+        fillcolor="#dbeafe";
+        color="#3b82f6";
+        fontcolor="#1e3a8a";
+        fontsize=13;
+
+        STORE [label="In-Memory Store\n(DeviceStore singleton)\nbackend/core/store.py",
+               fillcolor="#bfdbfe"];
+        ALERTS [label="Alert Engine\nbackend/core/alerts.py",
+                fillcolor="#bfdbfe"];
+        WSHUB  [label="WebSocket Hub\n/ ws\nbackend/main.py",
+                fillcolor="#bfdbfe"];
+        REST   [label="REST Routes\n/ api/devices\nbackend/routes/devices.py",
+                fillcolor="#bfdbfe"];
+    }
+
+    // ── Cluster: Clients ────────────────────────────────────────────
+    subgraph cluster_clients {
+        label="Client Interfaces";
+        style="rounded,filled";
+        fillcolor="#dcfce7";
+        color="#22c55e";
+        fontcolor="#14532d";
+        fontsize=13;
+
+        DASH  [label="React Dashboard\n(Vite + WebSocket)\ndashboard/src/",
+               fillcolor="#bbf7d0"];
+        BOT   [label="Discord Bot\n(discord.py + REST)\nbot/",
+               fillcolor="#bbf7d0"];
+        USER  [label="Boss / User",
+               shape=octagon,
+               fillcolor="#86efac"];
+    }
+
+    // ── 16 labelled arrows (matches architecture.md table) ──────────
+    // Internal function calls
+    SIM    -> STORE  [label="1. write new state\n(internal call)",          style=dashed, color="#0ea5e9"];
+    SIM    -> WSHUB  [label="2. device_update\n(WS broadcast)",             color="#0ea5e9"];
+    STORE  -> ALERTS [label="3. check thresholds\n(internal call)",          style=dashed, color="#0ea5e9"];
+    ALERTS -> STORE  [label="4. store alert\n(internal call)",               style=dashed, color="#0ea5e9"];
+    ALERTS -> WSHUB  [label="5. alert\n(WS broadcast)",                       color="#0ea5e9"];
+
+    // Dashboard ↔ Backend
+    WSHUB  -> DASH   [label="6. snapshot / device_update / alert\nWS (JSON)", color="#7c3aed", penwidth=2];
+    DASH   -> WSHUB  [label="7. toggle\nWS (JSON)",                          color="#7c3aed", penwidth=2];
+    DASH   -> REST   [label="8. GET /api/usage\nHTTP GET",                   color="#7c3aed"];
+    REST   -> DASH   [label="9. JSON response\nHTTP 200",                    color="#7c3aed"];
+
+    // Bot ↔ Backend
+    WSHUB  -> BOT    [label="10. device_update / alert\nWS (JSON)",           color="#dc2626", penwidth=2];
+    BOT    -> REST   [label="11. GET /api/devices\nHTTP GET",                 color="#dc2626"];
+    BOT    -> REST   [label="12. GET /api/devices/{room}\nHTTP GET",          color="#dc2626"];
+    BOT    -> REST   [label="13. POST /api/devices/{id}/toggle\nHTTP POST",   color="#dc2626"];
+    BOT    -> REST   [label="14. GET /api/usage\nHTTP GET",                   color="#dc2626"];
+
+    // Backend internal (REST + WS mutate store)
+    REST   -> STORE  [label="15. read / mutate\n(internal call)",             style=dashed, color="#0ea5e9"];
+    WSHUB  -> STORE  [label="16. toggle → mutate\n(internal call)",           style=dashed, color="#0ea5e9"];
+
+    // ── User observation arrows (legend) ────────────────────────────
+    DASH   -> USER   [label="sees live UI", style=dotted, color="#475569"];
+    BOT    -> USER   [label="reads !status\n!room !usage",  style=dotted, color="#475569"];
+}

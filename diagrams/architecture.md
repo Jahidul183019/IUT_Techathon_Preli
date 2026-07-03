@@ -87,7 +87,19 @@ backend/
 
 ## Data Flow Diagram
 
-[Note: Mermaid diagram removed to comply with hackathon rules. Please use the "Labelled Arrow Reference" table below to manually draw this in Excalidraw or draw.io as requested by the problem statement.]
+![IoT Smart Home Monitor — System Architecture](./architecture.png)
+
+> **Source of truth for this diagram:** [`architecture.dot`](./architecture.dot) — a Graphviz DOT file. Every arrow below is mirrored 1-to-1 in the PNG so the diagram and the table can never drift apart.
+>
+> **To regenerate** (requires Graphviz):
+> ```bash
+> dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
+> dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
+> ```
+>
+> Both PNG and SVG are committed alongside the DOT source.
+
+*Mermaid was intentionally not used — the problem statement explicitly forbids it. Graphviz DOT was chosen because it is plain text (version-controllable, diff-able) and renders deterministically to a polished PNG/SVG.*
 
 ---
 
