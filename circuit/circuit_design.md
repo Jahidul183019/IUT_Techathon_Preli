@@ -1,54 +1,40 @@
-# ESP32 Circuit Design — One Room (2 Fans + 3 Lights)
+# Hardware Schematic & Circuit Design
 
-> **Live Wokwi demo:** [https://wokwi.com/projects/468536088941998081](https://wokwi.com/projects/468536088941998081)
-> — open in a browser to see the ESP32 demo harness with simplified switches, LEDs, and sensor substitutes used to illustrate the project flow.
+## 1. Context & Purpose
+As per the hackathon requirements, the physical office consists of 3 rooms (Drawing Room, Work Room 1, and Work Room 2), each equipped with exactly 2 fans and 3 lights, bringing the total to 15 controllable devices. 
 
-## 1. Pin Mapping Table
+To demonstrate the hardware architecture conceptually without overcomplicating the simulation interface, this circuit provides a **representative simulation for a single room (5 devices)** using an ESP32 microcontroller. Because the hardware logic, pin assignments, and software architecture are identical for all three rooms, proving the concept for one room mathematically and electrically validates the entire system. 
 
-### Control Pins (ESP32 → Relay Module)
+The design is fully simulated in Wokwi. Since Wokwi does not natively support high-voltage AC mains components (like 220V ceiling fans or incandescent bulbs), we use standard low-voltage electronic components as stand-ins. **The design makes physical sense** by mirroring the exact logical flow, current constraints, and pin selection rules that a real-world smart home system must follow to operate safely and reliably.
 
-| GPIO | Relay Channel | Device | Load Type | Mains Rating |
-|------|--------------|--------|-----------|--------------|
-| **GPIO 16** | CH1 | Fan 1 | AC Ceiling Fan (~75W) | 220V AC |
-| **GPIO 17** | CH2 | Fan 2 | AC Ceiling Fan (~75W) | 220V AC |
-| **GPIO 18** | CH3 | Light 1 | AC Bulb (~10W LED) | 220V AC |
-| **GPIO 19** | CH4 | Light 2 | AC Bulb (~10W LED) | 220V AC |
-| **GPIO 21** | CH5 | Light 3 | AC Bulb (~10W LED) | 220V AC |
+## 2. How to View and Run the Simulation
+Judges can interact with the live circuit simulation directly in their browser using Wokwi. The interface allows for real-time manipulation of environmental variables.
 
-### Feedback / Sensing Pins
+1. **Open the Wokwi Project:** [Click here to open the live simulation](https://wokwi.com/projects/468536088941998081)
+2. **Start the Simulation:** Click the green "Play" button at the top of the Wokwi interface. The ESP32 will boot and run the firmware.
+3. **Interact with Switches (Manual Override):** Click on any of the 5 slide switches to toggle their input states. You will see the corresponding red LEDs turn on and off immediately. This represents a user physically flipping a wall switch, which the ESP32 detects and responds to by triggering the load relay.
+4. **Interact with the Sensor (Power Draw):** Click and drag the potentiometer slider left or right. This simulates fluctuating analog power consumption on Fan 1 (e.g., changing the fan speed). The ESP32 continuously reads this varying voltage to calculate simulated wattage.
 
-| GPIO | Function | Connected To | Notes |
-|------|----------|-------------|-------|
-| **GPIO 34** | ADC (input-only) | ACS712 #1 (Fan 1) | Current sense, 0–3.3V analog |
-| **GPIO 35** | ADC (input-only) | ACS712 #2 (Fan 2) | Current sense, 0–3.3V analog |
-| **GPIO 32** | Digital input | Opto-feedback Light 1 | HIGH = on, LOW = off |
-| **GPIO 33** | Digital input | Opto-feedback Light 2 | HIGH = on, LOW = off |
-| **GPIO 25** | Digital input | Opto-feedback Light 3 | HIGH = on, LOW = off |
+## 3. Real-World to Simulation Mapping
+To understand what the circuit is doing and why, here is exactly how our low-voltage simulated components map to real-world smart office hardware:
 
-### Why These Specific GPIOs?
+| Real-World Component | Wokwi Simulated Component | Purpose in Circuit |
+|----------------------|---------------------------|--------------------|
+| **Manual Wall Switch** | **Slide Switch** | Allows physical override or toggling of the device state. It sends a digital `HIGH` (3.3V) or `LOW` (0V) signal to the ESP32 to register user intent. |
+| **Relay + AC Load (Fan/Light)** | **Red LED + 220Ω Resistor** | Acts as a visual indicator showing whether the ESP32 is currently commanding the relay to power the device. An illuminated LED means the relay is closed and the AC device is ON. |
+| **ACS712 Current Sensor** | **Potentiometer** | Simulates varying analog power draw (wattage) from a heavy appliance like a fan. It outputs an analog voltage between 0V and 3.3V based on the slider position. |
 
-| Choice | Reason |
-|--------|--------|
-| GPIO 16–21 for relay control | Safe general-purpose outputs, no boot conflicts |
-| GPIO 34, 35 for ADC | Input-only pins with ADC2 — ideal for analog read (no output needed) |
-| GPIO 32, 33, 25 for digital feedback | General-purpose input pins, no strapping-pin conflicts |
-| **Avoided**: GPIO 0, 2, 12, 15 | These are **strapping pins** — pulling them HIGH/LOW during boot can brick the ESP32 or enter flash mode |
-| **Avoided**: GPIO 6–11 | Connected to internal SPI flash — **never use** |
+### Real-World Equivalent Circuit Diagram
+While our Wokwi simulation uses a simple 3.3V LED to represent a load being turned ON, an actual physical deployment must use a relay module to safely isolate the low-voltage microcontroller from the dangerous 220V AC mains.
 
----
-
-## 2. How the Relay Module Switches Mains Loads
-
-### The Core Idea
-
-```
+```text
   LOW VOLTAGE SIDE                    HIGH VOLTAGE SIDE
   (ESP32, 3.3V logic)                (220V AC mains)
                                      
   ┌──────────┐    ┌──────────────┐    ┌──────────┐
   │  ESP32   │    │ Relay Module │    │  Fan or  │
   │          │    │              │    │  Light   │
-  │  GPIO 16 ├───►│ IN1  ┌────┐ │    │          │
+  │  GPIO 26 ├───►│ IN1  ┌────┐ │    │          │
   │          │    │      │opto│ │    │   L ──┐  │
   │     3.3V ├───►│ VCC  └──┬─┘ │    │       │  │
   │      GND ├───►│ GND    coil │    │   ┌───┘  │
@@ -61,236 +47,61 @@
                    (optocoupler)
 ```
 
-### Step-by-Step Signal Path
+In real life, when `GPIO 26` goes `HIGH`, it powers a tiny LED inside an **optocoupler** on the relay board. The light from this optocoupler hits a phototransistor, which then magnetically closes the physical relay switch, allowing 220V AC to flow to the Fan. Because there is only light passing between the two sides of the optocoupler, the 220V mains can never accidentally surge backward and fry the ESP32 (this is called *galvanic isolation*). 
 
+In our Wokwi simulation, we substitute the entire high-voltage side (Relay + AC Mains + Load) with a direct LED connection to `GPIO 26` for safe, immediate visual validation of the logic.
+
+## 4. Pin Mapping & Technical Details
+
+### Input Pins (Wall Switches & Sensors)
+These pins read the current physical state of the environment, continuously scanning for user interaction or sensor fluctuations.
+
+| Component | ESP32 GPIO | Function | Real-World Equivalent |
+|-----------|------------|----------|-----------------------|
+| **Switch 1** | **GPIO 16** | Digital Input | Wall switch for Fan 1 |
+| **Switch 2** | **GPIO 17** | Digital Input | Wall switch for Fan 2 |
+| **Switch 3** | **GPIO 18** | Digital Input | Wall switch for Light 1 |
+| **Switch 4** | **GPIO 19** | Digital Input | Wall switch for Light 2 |
+| **Switch 5** | **GPIO 21** | Digital Input | Wall switch for Light 3 |
+| **Potentiometer**| **GPIO 34** | Analog Input (ADC1) | ACS712 measuring Fan 1 current |
+
+*Technical Note on Inputs (Floating Pins):* The switch GPIOs must use internal pull-down resistors (`INPUT_PULLDOWN`) in the software configuration. If a pin is left "floating" (connected to nothing when the switch is OFF), it acts like an antenna and picks up ambient electrical noise, causing random false ON/OFF triggers. When the slide switch is ON (connected to 3.3V), the pin reads a solid `HIGH`. When OFF, the internal pull-down resistor connects the pin weakly to Ground, ensuring it reads a clean, stable `LOW`.
+
+### Output Pins (Simulated Loads)
+These pins drive the physical loads. In the simulation, they provide the voltage needed to illuminate the representative LEDs.
+
+| Component | ESP32 GPIO | Function | Real-World Equivalent |
+|-----------|------------|----------|-----------------------|
+| **LED 1** | **GPIO 26** | Digital Output | Relay Channel 1 -> Fan 1 |
+| **LED 2** | **GPIO 25** | Digital Output | Relay Channel 2 -> Fan 2 |
+| **LED 3** | **GPIO 27** | Digital Output | Relay Channel 3 -> Light 1 |
+| **LED 4** | **GPIO 33** | Digital Output | Relay Channel 4 -> Light 2 |
+| **LED 5** | **GPIO 32** | Digital Output | Relay Channel 5 -> Light 3 |
+
+*Technical Note on Outputs (Current Limits):* The LEDs are driven directly by 3.3V logic signals from the ESP32. A **220Ω series resistor** is used for each LED to limit the current draw. Assuming a standard red LED has a forward voltage drop of roughly 2.0V, Ohm's law dictates the current: `I = V/R = (3.3V - 2.0V) / 220Ω ≈ 5.9mA`. The ESP32 has a strict maximum safe sourcing limit of **12mA per GPIO pin**. Drawing 5.9mA proves that this circuit is electrically sound and will not overheat or degrade the microcontroller over time.
+
+### GPIO Selection Rationale
+Choosing pins on an ESP32 is not arbitrary; many pins have hidden secondary functions or restrictions that can crash the system if used incorrectly.
+- **Outputs (25, 26, 27, 32, 33):** These are safe, general-purpose I/O (GPIO) pins. They have no special restrictions and do not interfere with the ESP32's boot sequence.
+- **Inputs (16, 17, 18, 19, 21):** These are standard input pins, chosen because they are completely independent of the ESP32's strapping pins.
+- **Analog Input (34):** Pin 34 is part of the **ADC1** (Analog-to-Digital Converter 1) hardware block. This is a critical design choice because the ESP32's Wi-Fi driver heavily utilizes the ADC2 hardware block. If we had used an ADC2 pin, attempting to read the potentiometer while the Wi-Fi was transmitting data to the backend would cause the read to fail or crash. Using ADC1 guarantees reliable, uninterrupted analog reads.
+- **Avoided Pins:** Boot strapping pins (GPIO 0, 2, 12, 15) determine the boot mode of the ESP32 (e.g., normal boot vs. firmware flashing mode) upon power-up. If external hardware pulls these high or low during startup, the device may refuse to boot entirely. Internal flash pins (GPIO 6-11) are physically wired to the ESP32's internal memory chip; using them will instantly crash the program. Both sets were strictly avoided in this design to ensure robust, enterprise-grade hardware stability.
+
+## 5. Wiring Diagram Summary
+
+Below is a schematic flow showing how the hardware logic operates inside the simulation. The flow of data is straightforward: user intent (slide switch) enters the ESP32 on the left, the software processes the request, and the corresponding action (LED/Relay) is output on the right.
+
+```text
+                      ┌─────────────────────────┐
+                      │       ESP32 DevKit      │
+                      │                         │
+[Slide SW 1 (3.3V)] ──► GPIO 16     GPIO 26 ────┼──► [LED 1 (Fan 1)] ──► 220Ω ──► GND
+[Slide SW 2 (3.3V)] ──► GPIO 17     GPIO 25 ────┼──► [LED 2 (Fan 2)] ──► 220Ω ──► GND
+[Slide SW 3 (3.3V)] ──► GPIO 18     GPIO 27 ────┼──► [LED 3 (Light 1)] ─► 220Ω ──► GND
+[Slide SW 4 (3.3V)] ──► GPIO 19     GPIO 33 ────┼──► [LED 4 (Light 2)] ─► 220Ω ──► GND
+[Slide SW 5 (3.3V)] ──► GPIO 21     GPIO 32 ────┼──► [LED 5 (Light 3)] ─► 220Ω ──► GND
+                      │                         │
+[Potentiometer SIG] ──► GPIO 34                 │
+                      │                         │
+                      └─────────────────────────┘
 ```
-1.  ESP32 GPIO 16 goes LOW (active-low relay modules are standard)
-          │
-          ▼
-2.  Current flows through the relay module's onboard OPTOCOUPLER LED
-    (the optocoupler provides galvanic isolation — mains can never
-     reach the ESP32 even if the relay fails)
-          │
-          ▼
-3.  Optocoupler phototransistor turns ON → activates a transistor
-    driver (typically an NPN like S8050 or ULN2003 on the module)
-          │
-          ▼
-4.  Transistor energizes the RELAY COIL (5V, ~70mA — the module's
-    own 5V supply provides this, NOT the ESP32 GPIO)
-          │
-          ▼
-5.  Relay coil creates a magnetic field → pulls the mechanical
-    CONTACT ARM from NC (normally closed) to NO (normally open)
-          │
-          ▼
-6.  The NO terminal is wired in series with the mains LIVE wire
-    to the fan/light → circuit completes → device turns ON
-```
-
-### Wiring per Device (Mains Side)
-
-```
-  AC MAINS         RELAY              LOAD (Fan/Light)
-  ┌─────┐     ┌────────────┐         ┌──────┐
-  │  L  ├────►│ COM    NO  ├────────►│  L   │
-  │     │     │            │         │      │
-  │  N  ├─────┼────────────┼────────►│  N   │
-  │     │     │     NC     │         │      │
-  └─────┘     └────────────┘         └──────┘
-
-  • L (Live) goes INTO the relay's COM (common) terminal
-  • Relay's NO (normally open) goes OUT to the device's Live
-  • N (Neutral) goes straight through to the device (not switched)
-  • NC (normally closed) is left unconnected
-```
-
-> [!CAUTION]
-> In Wokwi simulation, you won't actually wire 220V. Use LEDs or simulated loads to represent fans/lights. The relay click and GPIO state changes are what matter for the demo.
-
----
-
-## 3. Sensing State Feedback
-
-### Option A: GPIO Readback (Simple — For Lights)
-
-Since **you** control the relay, you already know the intended state. But to confirm the relay actually actuated (and detect relay failure), use an **optocoupler-based feedback circuit**:
-
-```
-  MAINS SIDE (after relay)           ESP32 SIDE
-  ┌──────────────────┐              ┌──────────┐
-  │                  │              │          │
-  │  Load Live ──┬───┤              │          │
-  │              │   │              │          │
-  │           ┌──┴──┐│              │          │
-  │           │Resis││  ┌────────┐  │          │
-  │           │220kΩ││  │  Opto  │  │          │
-  │           └──┬──┘│  │ PC817  │  │          │
-  │              │   ├──►│A    C├──►│ GPIO 32  │
-  │              │   │  │       │  │  (INPUT)  │
-  │  Load Neut ──┘   ├──►│K    E├──►│ GND      │
-  │                  │  └────────┘  │          │
-  └──────────────────┘     ▲        │  + 10kΩ  │
-                           │        │ pull-up   │
-                     galvanic       └──────────┘
-                     isolation
-```
-
-- When the load is ON → AC current flows through the 220kΩ resistor → optocoupler LED glows → phototransistor pulls GPIO 32 LOW
-- When OFF → no current → GPIO 32 reads HIGH (via pull-up)
-- **Result**: `digitalRead(GPIO_32) == LOW` means "Light is ON"
-
-### Option B: Current Sensing via ACS712 (For Fans — Measures Power Draw)
-
-The ACS712 is a **Hall-effect current sensor** that outputs an analog voltage proportional to current:
-
-```
-  ┌─────────────────────────────────────────────┐
-  │  ACS712-05B Module                           │
-  │                                              │
-  │  IP+ ◄── Live wire IN (from relay NO)        │
-  │  IP- ──► Live wire OUT (to fan)              │
-  │                                              │
-  │  VCC ◄── 5V (from relay module's 5V supply)  │
-  │  GND ◄── Common GND with ESP32               │
-  │  OUT ──► ESP32 GPIO 34 (ADC input)           │
-  │                                              │
-  │  Output: 2.5V at 0A (quiescent)              │
-  │          ±185mV per Amp                       │
-  └─────────────────────────────────────────────┘
-```
-
-**Reading current in code:**
-
-```cpp
-// On ESP32 (Arduino framework)
-float readCurrent(int pin) {
-    int raw = analogRead(pin);               // 0–4095 (12-bit ADC)
-    float voltage = (raw / 4095.0) * 3.3;    // Convert to volts
-    float current = (voltage - 2.5) / 0.185; // ACS712-05B: 185mV/A
-    return abs(current);                      // AC is bidirectional
-}
-
-// Fan drawing ~0.35A → voltage ≈ 2.5 + (0.35 × 0.185) ≈ 2.565V
-// Fan off → voltage ≈ 2.5V (quiescent)
-```
-
-> [!TIP]
-> **For Wokwi**: The ACS712 isn't natively available. Simulate it with a **potentiometer** on the ADC pin — turn it to represent different current draws. Explain in your demo video that it represents the ACS712 output.
-
-### Summary: Which Sensing Method Where?
-
-| Device | Sensing Method | Why |
-|--------|---------------|-----|
-| Lights 1–3 | GPIO readback (optocoupler) | Binary on/off is sufficient, cheap |
-| Fans 1–2 | ACS712 current sensor | Also reveals **power draw** and **speed** (useful for usage stats) |
-
----
-
-## 4. Electrical Reasoning
-
-### Why GPIOs Can't Drive Fans/Lights Directly
-
-| Parameter | ESP32 GPIO | Ceiling Fan | LED Bulb |
-|-----------|-----------|-------------|----------|
-| Voltage | 3.3V DC | **220V AC** | **220V AC** |
-| Max current | **12mA** per pin | ~340mA (75W) | ~45mA (10W) |
-| Total GPIO budget | **40mA** across all pins | — | — |
-
-> [!WARNING]
-> **Connecting a GPIO directly to a 220V load will instantly destroy the ESP32 and create a lethal shock hazard.** The relay provides complete electrical isolation between the logic side (3.3V) and the mains side (220V).
-
-### Relay Selection: Why a 10A 250VAC Relay Module
-
-| Spec | Value | Reason |
-|------|-------|--------|
-| **Contact rating** | 10A @ 250VAC | Ceiling fans draw ~0.35A, LED bulbs ~0.05A. 10A gives **28× headroom** for inrush current (motors spike 5–8× at startup) |
-| **Coil voltage** | 5V DC | Standard relay module supply. The module's onboard transistor drives the coil — ESP32 GPIO only drives the optocoupler LED (~1–2mA) |
-| **Isolation** | Optocoupler (e.g., PC817) | Provides **galvanic isolation** — even if the relay's mains-side contact welds shut, no mains voltage can reach the ESP32 |
-| **Channels** | 8-channel module | One module covers all 5 devices with 3 spare channels for future expansion |
-| **Flyback diode** | Built into module | Suppresses voltage spike when relay coil de-energizes — protects the driving transistor |
-
-### Why 5V Relay Modules With 3.3V ESP32?
-
-The ESP32 outputs **3.3V logic**, but most relay modules expect **5V trigger signals**. This is handled by the module design:
-
-```
-ESP32 GPIO (3.3V) ──► Optocoupler LED (forward voltage ~1.2V)
-                      ↓
-                      Works fine at 3.3V — LED only needs ~1.2V and ~1mA
-                      ↓
-                      Optocoupler output drives the relay's 5V transistor
-                      (the module's own VCC supplies the 5V power)
-```
-
-> [!NOTE]
-> Most common relay modules (the blue ones with "SRD-05VDC" relays) work with 3.3V trigger just fine because the optocoupler LED has a low forward voltage. If you find one that doesn't trigger reliably, add a **level shifter** or use a module explicitly rated for 3.3V logic input.
-
-### ACS712 Rating Choice
-
-| Model | Range | Sensitivity | Best For |
-|-------|-------|-------------|----------|
-| ACS712-05B | ±5A | 185 mV/A | ✅ Our fans (0.35A) — best resolution |
-| ACS712-20A | ±20A | 100 mV/A | Overkill, lower resolution |
-| ACS712-30A | ±30A | 66 mV/A | High-power loads only |
-
-The **05B variant** gives the best resolution for small loads. A 0.35A fan produces a 65mV deviation from the 2.5V quiescent voltage — easily readable by the ESP32's 12-bit ADC.
-
----
-
-## Complete Wiring Summary (One Room)
-
-```
-                    ┌─────────────────────────┐
-                    │       ESP32 DevKit       │
-                    │                          │
-                    │  GPIO16 ──► Relay CH1 ───┼──► Fan 1 (220V AC)
-                    │  GPIO17 ──► Relay CH2 ───┼──► Fan 2 (220V AC)
-                    │  GPIO18 ──► Relay CH3 ───┼──► Light 1 (220V AC)
-                    │  GPIO19 ──► Relay CH4 ───┼──► Light 2 (220V AC)
-                    │  GPIO21 ──► Relay CH5 ───┼──► Light 3 (220V AC)
-                    │                          │
-                    │  GPIO34 ◄── ACS712 #1 ◄──┼── Fan 1 current
-                    │  GPIO35 ◄── ACS712 #2 ◄──┼── Fan 2 current
-                    │  GPIO32 ◄── Opto #1   ◄──┼── Light 1 state
-                    │  GPIO33 ◄── Opto #2   ◄──┼── Light 2 state
-                    │  GPIO25 ◄── Opto #3   ◄──┼── Light 3 state
-                    │                          │
-                    │  3.3V ──► Relay VCC (logic trigger power)
-                    │  GND  ──► Common GND     │
-                    │                          │
-                    │  (Relay module also needs │
-                    │   separate 5V for coils   │
-                    │   from USB or external    │
-                    │   5V supply — JD-VCC)     │
-                    └─────────────────────────┘
-```
-
----
-
-## Wokwi-Specific Notes
-
-Since Wokwi doesn't have mains simulation, the project uses simplified components to demonstrate the control flow:
-
-| Real Component | Wokwi Substitute | How to Demo |
-|---------------|-------------------|-------------|
-| Ceiling Fan (220V) | **LED + label** "Fan" | LED ON = fan running |
-| LED Bulb (220V) | **LED** (different color) | Direct visual feedback |
-| 8-ch Relay Module | **Relay component** or switch proxy | Shows on/off control |
-| ACS712 | **Potentiometer** on ADC pin | Turn to simulate current draw |
-| Optocoupler feedback | **Button/switch** on input pin | Press = device confirmed ON |
-| 220V AC Mains | Not simulated | Explain verbally in demo |
-
----
-
-## Demo Video Talking Points
-
-1. **"The ESP32 GPIO outputs 3.3V at only 12mA — it can't power a 220V fan drawing 340mA. We use a relay as an electrically isolated switch."**
-
-2. **"The relay module has an optocoupler, so even if the high-voltage side fails, mains can never reach the ESP32. This is galvanic isolation."**
-
-3. **"For fans, we use an ACS712 Hall-effect sensor to measure actual current draw — this tells us not just on/off, but how much power the fan is consuming. For lights, a simple optocoupler readback confirms the relay actuated."**
-
-4. **"We chose GPIO 16–21 for relay outputs because they're safe — they don't conflict with boot strapping pins (GPIO 0, 2, 12, 15) which could prevent the ESP32 from booting."**
-
-5. **"The 10A relay rating gives us 28× headroom over the fan's steady-state current, which is critical because motors draw 5–8× surge current at startup."**
