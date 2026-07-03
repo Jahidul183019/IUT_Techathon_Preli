@@ -1,5 +1,8 @@
 # ESP32 Circuit Design — One Room (2 Fans + 3 Lights)
 
+> **Live Wokwi demo:** [https://wokwi.com/projects/468536088941998081](https://wokwi.com/projects/468536088941998081)
+> — open in a browser to see the ESP32 demo harness with simplified switches, LEDs, and sensor substitutes used to illustrate the project flow.
+
 ## 1. Pin Mapping Table
 
 ### Control Pins (ESP32 → Relay Module)
@@ -267,13 +270,13 @@ The **05B variant** gives the best resolution for small loads. A 0.35A fan produ
 
 ## Wokwi-Specific Notes
 
-Since Wokwi doesn't have mains simulation:
+Since Wokwi doesn't have mains simulation, the project uses simplified components to demonstrate the control flow:
 
 | Real Component | Wokwi Substitute | How to Demo |
 |---------------|-------------------|-------------|
 | Ceiling Fan (220V) | **LED + label** "Fan" | LED ON = fan running |
 | LED Bulb (220V) | **LED** (different color) | Direct visual feedback |
-| 8-ch Relay Module | **Relay component** (built-in) | Shows click animation |
+| 8-ch Relay Module | **Relay component** or switch proxy | Shows on/off control |
 | ACS712 | **Potentiometer** on ADC pin | Turn to simulate current draw |
 | Optocoupler feedback | **Button/switch** on input pin | Press = device confirmed ON |
 | 220V AC Mains | Not simulated | Explain verbally in demo |

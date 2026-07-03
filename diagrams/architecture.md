@@ -2,7 +2,7 @@
 
 ## Overview
 
-A real-time IoT monitoring platform with **15 simulated devices** across 3 rooms, a **FastAPI backend** as the single source of truth, and two consumer interfaces (React dashboard + Discord bot) that stay in sync via a shared WebSocket broadcast channel.
+A real-time IoT monitoring platform with **15 simulated devices** across 3 rooms, a **FastAPI backend** as the single source of truth, and two consumer interfaces: a React dashboard that listens over WebSocket and a Discord bot that reads the same backend state through REST and alert polling.
 
 ---
 
@@ -46,8 +46,8 @@ backend/
 | `/api/devices` | GET | All 15 devices with current state |
 | `/api/devices/{room}` | GET | Devices filtered by room slug |
 | `/api/devices/{id}/toggle` | POST | Toggle a specific device, returns new state |
-| `/api/usage` | GET | Per-room and total power/energy stats |
-| `/api/alerts` | GET | List of recent alerts |
+| `/api/devices/stats/usage` | GET | Per-room and total power/energy stats |
+| `/api/devices/stats/alerts` | GET | List of recent alerts |
 
 **WebSocket Endpoint (`/ws`)**
 
@@ -73,15 +73,13 @@ backend/
 - Receives `device_update` → patches local React state for that device
 - Receives `alert` → shows toast notification
 - User clicks toggle → sends `{"event": "toggle", ...}` over WS → backend mutates store → broadcasts `device_update` back to **all** clients (including this one)
-- Also can call REST endpoints for historical data (`GET /api/usage`)
+- Also can call REST endpoints for historical data (`GET /api/devices/stats/usage`)
 
 ### 4. Discord Bot (discord.py)
 
-- **REST consumer**: calls `GET /api/devices`, `GET /api/usage`, `POST /api/devices/{id}/toggle` via `aiohttp`
-- **WebSocket listener**: connects to `ws://backend/ws` in a background task
-  - On `alert` event → sends an embed to a configured Discord channel
-  - On `device_update` → optionally logs or updates a status message
-- Commands: `!devices`, `!room <name>`, `!toggle <id>`, `!usage`, `!alerts`
+- **REST consumer**: calls `GET /api/devices`, `GET /api/devices/{room}`, and `GET /api/devices/stats/usage` via `httpx`
+- **Alert poller**: checks `GET /api/devices/stats/alerts` in the background and sends proactive Discord channel messages
+- Commands: `!status`, `!room <name>`, `!usage`
 
 ---
 
@@ -116,13 +114,12 @@ Use this table to draw each arrow precisely:
 | 5 | Alert Engine | WebSocket Hub | `alert` | Internal → WS broadcast |
 | 6 | WebSocket Hub | React Dashboard | `snapshot` / `device_update` / `alert` | **WebSocket (JSON)** |
 | 7 | React Dashboard | WebSocket Hub | `toggle` | **WebSocket (JSON)** |
-| 8 | React Dashboard | REST Routes | `GET /api/usage` | **HTTP GET** |
+| 8 | React Dashboard | REST Routes | `GET /api/devices/stats/usage` | **HTTP GET** |
 | 9 | REST Routes | React Dashboard | JSON response | **HTTP 200** |
-| 10 | WebSocket Hub | Discord Bot | `device_update` / `alert` | **WebSocket (JSON)** |
-| 11 | Discord Bot | REST Routes | `GET /api/devices` | **HTTP GET** |
-| 12 | Discord Bot | REST Routes | `GET /api/devices/{room}` | **HTTP GET** |
-| 13 | Discord Bot | REST Routes | `POST /api/devices/{id}/toggle` | **HTTP POST** |
-| 14 | Discord Bot | REST Routes | `GET /api/usage` | **HTTP GET** |
+| 10 | Discord Bot | REST Routes | `GET /api/devices` | **HTTP GET** |
+| 11 | Discord Bot | REST Routes | `GET /api/devices/{room}` | **HTTP GET** |
+| 12 | Discord Bot | REST Routes | `GET /api/devices/stats/usage` | **HTTP GET** |
+| 13 | Discord Bot | REST Routes | `GET /api/devices/stats/alerts` | **HTTP GET** |
 | 15 | REST Routes | In-Memory Store | `read / mutate` | Internal function call |
 | 16 | WebSocket Hub | In-Memory Store | `toggle → mutate` | Internal function call |
 
