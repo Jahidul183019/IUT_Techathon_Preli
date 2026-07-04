@@ -43,7 +43,7 @@
 
 ## Project Highlights
 
-- **15-device IoT simulation**: 3 rooms, each with 2 fans, 3 lights, and 1 AC.
+- **15-device IoT simulation**: 3 rooms, each with 2 fans, 3 lights.
 - **Single source of truth**: all device state lives in the FastAPI in-memory store.
 - **Live dashboard**: React/Vite interface receives snapshots, device updates, and alerts over WebSocket.
 - **Discord operations bot**: `!status`, `!room`, and `!usage` commands read the same backend data through REST.
@@ -60,7 +60,7 @@ The backend is intentionally the authority. The simulator, dashboard toggles, RE
 
 | Objective | Description |
 |-----------|-------------|
-| **Device Monitoring** | Track ON/OFF state for 18 simulated fans, lights, and ACs across 3 rooms. |
+| **Device Monitoring** | Track ON/OFF state for 18 simulated fans, lights across 3 rooms. |
 | **Real-Time Visibility** | Push state changes instantly to the dashboard through WebSocket events. |
 | **Power Awareness** | Estimate live watts, active devices, room-level load, and daily kWh usage. |
 | **Alerting** | Flag after-hours device usage and full-room continuous-load conditions. |
