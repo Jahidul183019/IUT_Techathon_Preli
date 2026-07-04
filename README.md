@@ -1,62 +1,205 @@
+<div align="center">
+
 # Smart Home IoT Monitor
+### *Sense it. Stream it. Act on it.*
 
-Smart Home IoT Monitor is a three-part IoT simulation for the IUT Techathon: a FastAPI backend, a React dashboard, and a Discord bot. The backend simulates 15 devices across three rooms, keeps all state in one in-memory store, and exposes that state to both clients so the dashboard and bot always reflect the same source of truth.
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Discord.py](https://img.shields.io/badge/Discord.py-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discordpy.readthedocs.io/)
 
-## Overview
+<p align="center">
+  <strong>A real-time smart office energy and device-monitoring platform</strong><br>
+  <em>FastAPI backend + React dashboard + Discord bot sharing one live IoT state store</em>
+</p>
 
-The project is organized around a single backend state store in [backend/core/store.py](backend/core/store.py). The dashboard consumes live updates over WebSocket, while the Discord bot reads the same backend data through REST and posts proactive alert notifications to a Discord channel.
+---
 
-* **Single source of truth**: FastAPI backend state in [backend/core/store.py](backend/core/store.py)
-* **Live dashboard**: React UI connected to [backend/main.py](backend/main.py) via `/ws`
-* **Discord bot**: Command responses from REST plus proactive alert polling in [bot/bot.py](bot/bot.py)
+</div>
 
-For live deployment updates, check the deployed Backend at [Render](https://iot-smart-home-backend-8au0.onrender.com/) and the dashboard on Vercel.
+## Project Highlights
 
-The architecture diagram is provided as both source and rendered output: [diagrams/architecture.dot](diagrams/architecture.dot), [diagrams/architecture.png](diagrams/architecture.png), and [diagrams/architecture.svg](diagrams/architecture.svg). The matching arrow reference table and regeneration instructions are in [diagrams/architecture.md](diagrams/architecture.md).
+- **15-device IoT simulation**: 3 rooms, each with 2 fans and 3 lights.
+- **Single source of truth**: all device state lives in the FastAPI in-memory store.
+- **Live dashboard**: React/Vite interface receives snapshots, device updates, and alerts over WebSocket.
+- **Discord operations bot**: `!status`, `!room`, and `!usage` commands read the same backend data through REST.
+- **Automated alerts**: after-hours device activity and continuously active rooms are detected and broadcast.
+- **Hardware-aware design**: Wokwi ESP32 circuit models relay outputs, manual switches, and current sensing.
 
-For the conceptual ESP32 wiring, relay logic, ACS712 current sensing, and opto-isolated feedback, see [circuit/circuit_design.md](circuit/circuit_design.md).
+## Introduction
 
-## 📂 Folder Structure
+Smart Home IoT Monitor was built for the IUT Techathon preliminary round. It demonstrates how an office automation system can monitor fans and lights in real time, estimate current power draw, surface actionable alerts, and expose the same state to both a web dashboard and a Discord bot.
 
-```text
-project-root/
-├── backend/          # FastAPI app (WebSocket endpoint, REST API, Async Simulator)
-│   ├── main.py       # App entrypoint and connection manager
-│   ├── requirements.txt
-│   ├── core/         # Business logic (models, store, alerts, simulator)
-│   └── routes/       # REST API endpoints
-├── dashboard/        # React (Vite) frontend for live monitoring
-│   ├── src/          # React components (OfficeFloorplan, PowerInsight, etc.)
-│   │   ├── components/
-│   │   │   ├── OfficeFloorplan.tsx     # Visual 3-room layout with smart grid
-│   │   │   ├── PowerInsight.tsx        # Live wattage and kWh estimation
-│   │   │   ├── SupportModal.tsx        # System info & support contacts
-│   │   │   └── ...                     # Other UI views
-│   │   └── hooks/
-│   └── package.json  # NPM dependencies
-├── bot/              # Discord.py bot
-│   ├── bot.py        # Client setup and automated alert polling
-│   ├── commands.py   # User commands (!status, !room, !usage)
-│   └── requirements.txt
-├── circuit/          # ESP32 + relay + ACS712 hardware schematic
-│   └── circuit_design.md
-├── diagrams/         # System architecture diagram (DOT source + rendered PNG/SVG)
-│   ├── architecture.dot
-│   ├── architecture.png
-│   ├── architecture.svg
-│   └── architecture.md
-├── .env.example      # Environment variables template
-├── Hackathon Problem Statement (Preliminary Round) v1.1.pdf
-└── README.md         # This file
-```
+The backend is intentionally the authority. The simulator, dashboard toggles, REST routes, WebSocket broadcasts, and bot commands all read from or mutate the same `DeviceStore` singleton in [backend/core/store.py](backend/core/store.py). This keeps the dashboard and bot synchronized without separate client-side state machines.
 
-## Setup
+### Key Objectives
 
-Copy the example environment file and fill in your values:
+| Objective | Description |
+|-----------|-------------|
+| **Device Monitoring** | Track ON/OFF state for 15 simulated fans and lights across 3 rooms. |
+| **Real-Time Visibility** | Push state changes instantly to the dashboard through WebSocket events. |
+| **Power Awareness** | Estimate live watts, active devices, room-level load, and daily kWh usage. |
+| **Alerting** | Flag after-hours device usage and full-room continuous-load conditions. |
+| **Operational Access** | Provide Discord commands and proactive channel alerts for quick remote checks. |
+| **Circuit Reasoning** | Document a realistic ESP32 relay/sensor design for physical deployment. |
+
+---
+
+## Key Features
+
+<table>
+<tr>
+<td width="50%">
+
+### Live Backend Simulation
+
+- FastAPI application with REST and WebSocket APIs
+- Async simulator ticks every few seconds
+- Time-of-day bias for realistic ON/OFF behavior
+- Pydantic models for devices, rooms, usage, and alerts
+- Shared in-memory store for all consumers
+
+</td>
+<td width="50%">
+
+### Interactive React Dashboard
+
+- WebSocket snapshot-on-connect
+- Live device toggles from the floorplan
+- Power insight cards and room load bars
+- Alerts panel with severity states
+- Map, analytics, device, security, support, and logs views
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### Discord Bot
+
+- `!status` for whole-office status
+- `!room drawing`, `!room work1`, `!room work2`
+- `!usage` / `!power` for current load and kWh estimate
+- Alert polling every minute
+- Gemini primary response generation with Groq fallback keys
+
+</td>
+<td width="50%">
+
+### Hardware Concept
+
+- ESP32-based one-room representative circuit
+- 5 relay outputs mapped to 3 lights and 2 fans
+- Slide switches as manual wall-switch inputs
+- Potentiometer as ACS712 current-sensor stand-in
+- Wokwi simulation and circuit rationale included
+
+</td>
+</tr>
+</table>
+
+---
+
+## System Architecture
+
+![IoT Smart Home Monitor architecture](diagrams/architecture.png)
+
+The architecture diagram is maintained as Graphviz source in [diagrams/architecture.dot](diagrams/architecture.dot), with rendered PNG/SVG outputs committed in [diagrams/](diagrams/). The full arrow reference and regeneration instructions are documented in [diagrams/architecture.md](diagrams/architecture.md).
+
+### Data Flow
+
+1. The simulator in [backend/core/simulator.py](backend/core/simulator.py) periodically changes device state.
+2. The store in [backend/core/store.py](backend/core/store.py) keeps the authoritative 15-device inventory.
+3. Alert checks in [backend/core/alerts.py](backend/core/alerts.py) generate warning and critical alerts.
+4. REST routes in [backend/routes/devices.py](backend/routes/devices.py) expose devices, room data, usage, alerts, and toggles.
+5. The WebSocket endpoint in [backend/main.py](backend/main.py) sends `snapshot`, `device_update`, and `alert` messages.
+6. The React dashboard mirrors backend state and sends toggle commands.
+7. The Discord bot polls REST endpoints for commands and proactive alert notifications.
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|:------|:-------------|
+| **Backend** | Python 3, FastAPI, Uvicorn, Pydantic v2, WebSockets |
+| **Frontend** | React 19, TypeScript, Vite, Tailwind CSS v4, Lucide React, Motion, Recharts |
+| **Bot** | discord.py, httpx, python-dotenv, Google Gemini API, Groq API |
+| **Simulation** | Async Python simulator, in-memory store, time-of-day alert rules |
+| **Hardware Design** | ESP32, Wokwi, relay logic, slide switches, ACS712-style sensing model |
+| **Deployment Targets** | Render for backend/bot, Vercel for dashboard |
+
+---
+
+## Installation & Setup
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Python 3.9+
+- Discord bot token, only if running the bot
+- Gemini or Groq API key, optional for LLM-generated bot responses
+- Graphviz, optional for regenerating the architecture diagram
+
+### Quick Start
+
+From the project root:
+
 ```bash
 cp .env.example .env
+./shell.sh
 ```
-The canonical template contains 8 variables:
+
+The script creates a backend virtual environment if needed, installs backend/frontend dependencies, and starts:
+
+- Backend: `http://localhost:8000`
+- Dashboard: `http://localhost:3000`
+
+It also exports local dashboard URLs so the frontend points at your local backend instead of the deployed Render backend.
+
+### Run Services Individually
+
+Backend:
+
+```bash
+cd backend
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Dashboard:
+
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+
+For local backend integration without `./shell.sh`, set dashboard environment variables:
+
+```env
+VITE_API_URL=http://localhost:8000
+VITE_WS_URL=ws://localhost:8000/ws
+```
+
+Discord bot:
+
+```bash
+cd bot
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+python bot.py
+```
+
+### Configuration
+
+Copy [.env.example](.env.example) to `.env` and fill in the values you need:
+
 ```env
 # Backend
 BACKEND_HOST=0.0.0.0
@@ -66,96 +209,141 @@ BACKEND_PORT=8000
 DISCORD_BOT_TOKEN=your-discord-bot-token-here
 BACKEND_API_URL=http://localhost:8000
 DISCORD_ALERT_CHANNEL_ID=optional-channel-id-here
-GEMINI_API_KEY=your-gemini-api-key-here        # primary LLM key
-GROQ_API_KEY_1=your-groq-api-key-1-here        # optional fallback key
-GROQ_API_KEY_2=your-groq-api-key-2-here        # optional fallback key
-GROQ_API_KEY_3=your-groq-api-key-3-here        # optional fallback key
+GROQ_API_KEY_1=your-groq-api-key-1-here
+GROQ_API_KEY_2=your-groq-api-key-2-here
+GROQ_API_KEY_3=your-groq-api-key-3-here
+GEMINI_API_KEY=your-gemini-api-key-here
 
 # Dashboard
 VITE_WS_URL=ws://localhost:8000/ws
 VITE_API_URL=http://localhost:8000
 ```
 
-### Backend
-Requires Python 3.9+.
-```bash
-cd backend
-pip install -r requirements.txt
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-The backend starts the simulator automatically on launch.
+If dashboard variables are unset, [dashboard/src/hooks/useBackendDevices.ts](dashboard/src/hooks/useBackendDevices.ts) falls back to the deployed Render backend.
 
-### Dashboard
-Requires Node.js 18+.
-```bash
-cd dashboard
-npm install
-npm run dev -- --port 5173
-```
-Open `http://localhost:5173` to view the live dashboard.
+---
 
-### Discord Bot
-Requires Python 3.9+.
-```bash
-cd bot
-pip install -r requirements.txt
-python bot.py
+## API Reference
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/health` | GET | Backend health, device count, and connected WebSocket clients |
+| `/ws` | WebSocket | Live `snapshot`, `device_update`, `alert`, and `pong` messages |
+| `/api/devices/` | GET | All 15 devices with current state |
+| `/api/devices/{room}` | GET | Devices for `drawing_room`, `work_room_1`, or `work_room_2` |
+| `/api/devices/{device_id}/toggle` | POST | Toggle one device and broadcast the update |
+| `/api/devices/stats/usage` | GET | Total watts, active devices, room usage, and estimated kWh today |
+| `/api/devices/stats/alerts?limit=20` | GET | Recent alerts, newest first |
+
+WebSocket client toggle message:
+
+```json
+{
+  "type": "toggle",
+  "data": {
+    "device_id": "dr_fan_1"
+  }
+}
 ```
-The bot listens for `!status`, `!room`, and `!usage`, and it polls backend alerts for proactive channel posts.
+
+---
+
+## Discord Commands
+
+| Command | Description |
+|---------|-------------|
+| `!status` | Summarizes all room device states. |
+| `!room drawing` | Shows Drawing Room fan/light state. |
+| `!room work1` | Shows Work Room 1 fan/light state. |
+| `!room work2` | Shows Work Room 2 fan/light state. |
+| `!usage` | Reports current watts and estimated kWh today. |
+| `!power` | Alias for `!usage`. |
+
+When Gemini or Groq keys are configured, bot responses are rewritten into short conversational summaries. If no LLM provider is available, the bot falls back to deterministic formatted responses.
+
+---
+
+## Project Structure
+
+```text
+project-root/
+├── backend/                         # FastAPI backend and simulator
+│   ├── main.py                      # App entrypoint, CORS, health, WebSocket
+│   ├── requirements.txt
+│   ├── core/
+│   │   ├── alerts.py                # After-hours and continuous-load alert rules
+│   │   ├── models.py                # Pydantic models and 15-device seed data
+│   │   ├── simulator.py             # Async background device simulator
+│   │   ├── store.py                 # DeviceStore singleton
+│   │   └── time_utils.py
+│   └── routes/
+│       └── devices.py               # REST endpoints
+├── dashboard/                       # React/Vite dashboard
+│   ├── src/
+│   │   ├── components/              # Dashboard panels, modals, floorplan, views
+│   │   ├── hooks/
+│   │   │   └── useBackendDevices.ts # REST + WebSocket integration
+│   │   ├── App.tsx
+│   │   └── types.ts
+│   ├── package.json
+│   └── vite.config.ts
+├── bot/                             # Discord bot
+│   ├── bot.py                       # Client setup, health server, alert polling
+│   ├── commands.py                  # !status, !room, !usage commands
+│   └── requirements.txt
+├── circuit/                         # ESP32 circuit documentation
+│   ├── circuit_design.md
+│   └── diagram.json
+├── diagrams/                        # Architecture source and rendered outputs
+│   ├── architecture.dot
+│   ├── architecture.md
+│   ├── architecture.png
+│   └── architecture.svg
+├── .env.example
+├── shell.sh                         # Starts backend and dashboard together
+├── Hackathon Problem Statement (Preliminary Round) v1.1.pdf
+└── README.md
+```
+
+---
 
 ## Demo Flow
 
-For judging or a recorded walkthrough:
-1. Start the backend, dashboard, and bot in separate terminals.
-2. Open the dashboard and confirm the WebSocket badge shows `connected`.
-3. Toggle a device from the dashboard and verify the updated state appears immediately in the UI and in `!usage`.
-4. Run `!status`, `!room drawing`, and `!usage` in Discord to confirm the bot is reading live backend data.
-5. Trigger an alert condition and show the alert appear in both the dashboard and Discord.
-
-The simulator and alert rules match the problem statement: 15 devices total, 3 rooms, 2 fans + 3 lights per room, after-hours alerts, and a continuous full-room-on rule.
-
----
-
-## Codebase Notes
-
-- **Conventional commits** are used for repository history.
-- **Pydantic v2** models enforce the 15-device inventory invariant in [backend/core/models.py](backend/core/models.py).
-- **WebSocket snapshot-on-connect** ensures the dashboard renders immediately without a loading flash.
-- **Singleton store** is the only mutable backend state; dashboard and bot both read from it indirectly.
+1. Copy `.env.example` to `.env` and start the backend/dashboard with `./shell.sh`.
+2. Open `http://localhost:3000` and confirm the connection badge shows `connected`.
+3. Toggle a fan or light from the office floorplan.
+4. Verify the power insight panel and device inventory update immediately.
+5. Run `!status`, `!room drawing`, and `!usage` in Discord after starting the bot.
+6. Wait for or trigger alert conditions and show the alert in both the dashboard and Discord channel.
+7. Open the hardware documentation in [circuit/circuit_design.md](circuit/circuit_design.md) and the live Wokwi simulation linked there.
 
 ---
 
-## Video Demo
+## Engineering Notes
 
-A 3-minute walkthrough is included with the submission link. It demonstrates:
-
-1. Launching the backend, dashboard, and bot side-by-side in three terminals
-2. The dashboard connecting over WebSocket and rendering live device state
-3. Toggling a device from the dashboard and verifying the change in Discord
-4. The bot responding to `!status`, `!room drawing`, and `!usage`
-5. A critical alert appearing on the dashboard and as a Discord channel notification
-6. A short tour of the architecture diagram and circuit design
+- The backend has no database by design; state resets when the backend process restarts.
+- WebSocket clients receive a full state snapshot immediately after connecting.
+- Dashboard toggles prefer WebSocket and fall back to REST if the socket is unavailable.
+- Alert deduplication uses a cooldown window to avoid repeated messages for the same condition.
+- The bot polls alerts once per minute, so Discord proactive alerts may lag the dashboard slightly.
+- The fixed inventory is enforced by seed data: 3 rooms x 5 devices = 15 devices.
 
 ---
 
-## Engineering Process
+## Additional Documentation
 
-As required by the problem statement, here is an outline of the engineering decisions behind the significant features of this system:
+- [System architecture](diagrams/architecture.md)
+- [Architecture DOT source](diagrams/architecture.dot)
+- [Circuit design and Wokwi simulation](circuit/circuit_design.md)
+- [Dashboard-specific README](dashboard/README.md)
+- [Hackathon problem statement](Hackathon%20Problem%20Statement%20%28Preliminary%20Round%29%20v1.1.pdf)
 
-### 1. Simulated Device Layer & Backend
-- **Assumptions**: The system requires simulating 15 devices across 3 rooms (2 fans + 3 lights per room). The backend must serve as the single source of truth for both the dashboard and the Discord bot.
-- **Implementation Plan**: Built with FastAPI. A background async simulator randomly toggles devices based on time-of-day probabilities to simulate activity. State is kept in a centralized in-memory `device_store`.
-- **Trade-offs**: An in-memory store is fast and easy to set up without external dependencies, but state is lost on restart. Given the hackathon simulation requirements, this is a pragmatic trade-off over configuring a full PostgreSQL/Redis database.
-- **Validation Approach**: Verified via REST API endpoints and ensuring both the dashboard and Discord bot always reflect identical state changes in real-time.
+---
 
-### 2. Live Web Dashboard
-- **Assumptions**: The dashboard needs to reflect real-time updates without manual page refreshes, display an active alerts panel, and visually represent device states.
-- **Implementation Plan**: Built with React (Vite). Uses WebSockets to connect to the FastAPI backend, listening for instant `device_update` and `alert` events.
-- **Trade-offs**: WebSockets require persistent connections, which can be slightly more complex to deploy and scale than simple HTTP polling. However, it perfectly meets the "no manual refresh" requirement with much lower latency and network overhead.
-- **Validation Approach**: Tested by opening multiple dashboard tabs; toggling a device in one instantly reflects the state change across all open tabs.
+## Future Roadmap
 
-### 3. Discord Bot
-- **Assumptions**: The bot needs to fetch live data from the shared backend and proactively notify a channel when alerts occur. It should respond conversationally.
-- **Implementation Plan**: Built with `discord.py`. Uses REST API calls (`/api/devices`, `/api/alerts`) for responding to commands (`!status`, `!usage`, `!room`). A background task polls the backend for new alerts. LLM-generated friendly responses (via a Gemini API primary and multiple Groq API fallbacks) are used to humanize the bot.
-- **Trade-offs**: Polling for alerts (instead of using WebSockets for the bot) simplifies the bot architecture and avoids managing multiple persistent connection paradigms, though it introduces a slight delay in proactive alerts.
-- **Validation Approach**: Tested commands in Discord to verify they fetch correct data from the backend. Triggered alert conditions in the backend and verified the bot proactively posts to the designated channel.
+- Persist device history and alerts in a database.
+- Add alert acknowledgement APIs and dashboard state.
+- Bridge the simulator to physical ESP32 telemetry.
+- Replace mock historical analytics with stored time-series data.
+- Add authentication for production dashboard and bot operations.
