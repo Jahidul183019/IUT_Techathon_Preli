@@ -8,7 +8,7 @@ Includes a background task to poll alerts and post them to a designated channel.
 import os
 import asyncio
 import threading
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import httpx
 import discord
 from discord.ext import commands, tasks
@@ -17,18 +17,16 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 def run_health_server():
-    class HealthHandler(SimpleHTTPRequestHandler):
+    class HealthHandler(BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path in ("/", "/health"):
+                body = b"Bot is online and healthy"
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
+                self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
-                self.wfile.write(b"Bot is online and healthy")
+                self.wfile.write(body)
             elif self.path == "/check-llm":
-                self.send_response(200)
-                self.send_header("Content-type", "application/json")
-                self.end_headers()
-                
                 import json
                 keys_status = {
                     "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
@@ -36,7 +34,12 @@ def run_health_server():
                     "GROQ_API_KEY_2": bool(os.getenv("GROQ_API_KEY_2")),
                     "GROQ_API_KEY_3": bool(os.getenv("GROQ_API_KEY_3")),
                 }
-                self.wfile.write(json.dumps(keys_status).encode('utf-8'))
+                body = json.dumps(keys_status).encode('utf-8')
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
             else:
                 self.send_response(404)
                 self.end_headers()
@@ -45,13 +48,27 @@ def run_health_server():
             if self.path in ("/", "/health"):
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
+                self.send_header("Content-Length", str(len(b"Bot is online and healthy")))
+                self.end_headers()
+            elif self.path == "/check-llm":
+                import json
+                keys_status = {
+                    "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
+                    "GROQ_API_KEY_1": bool(os.getenv("GROQ_API_KEY_1")),
+                    "GROQ_API_KEY_2": bool(os.getenv("GROQ_API_KEY_2")),
+                    "GROQ_API_KEY_3": bool(os.getenv("GROQ_API_KEY_3")),
+                }
+                body = json.dumps(keys_status).encode('utf-8')
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
             else:
                 self.send_response(404)
                 self.end_headers()
 
     port = int(os.getenv("PORT", 8080))
-    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", port), HealthHandler)
     print(f"🏥 Health check server running on port {port}")
     server.serve_forever()
 
