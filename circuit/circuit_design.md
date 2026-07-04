@@ -1,9 +1,9 @@
 # Hardware Schematic & Circuit Design
 
 ## 1. Context & Purpose
-As per the hackathon requirements, the physical office consists of 3 rooms (Drawing Room, Work Room 1, and Work Room 2), each equipped with exactly 2 fans and 3 lights, bringing the total to 15 controllable devices. 
+As per the hackathon requirements, the physical office consists of 3 rooms (Drawing Room, Work Room 1, and Work Room 2), each equipped with exactly 2 fans, 3 lights, and 1 AC, bringing the total to 18 controllable devices. 
 
-To demonstrate the hardware architecture conceptually without overcomplicating the simulation interface, this circuit provides a **representative simulation for a single room (5 devices)** using an ESP32 microcontroller. Because the hardware logic, pin assignments, and software architecture are identical for all three rooms, proving the concept for one room mathematically and electrically validates the entire system. 
+To demonstrate the hardware architecture conceptually without overcomplicating the simulation interface, this circuit provides a **representative simulation for a single room (6 devices)** using an ESP32 microcontroller. Because the hardware logic, pin assignments, and software architecture are identical for all three rooms, proving the concept for one room mathematically and electrically validates the entire system. 
 
 The design is fully simulated in Wokwi. Since Wokwi does not natively support high-voltage AC mains components (like 220V ceiling fans or incandescent bulbs), we use standard low-voltage electronic components as stand-ins. **The design makes physical sense** by mirroring the exact logical flow, current constraints, and pin selection rules that a real-world smart office system must follow to operate safely and reliably.
 
@@ -12,7 +12,7 @@ Judges can interact with the live circuit simulation directly in their browser u
 
 1. **Open the Wokwi Project:** [Click here to open the live simulation](https://wokwi.com/projects/468536088941998081)
 2. **Start the Simulation:** Click the green "Play" button at the top of the Wokwi interface. The ESP32 will boot and run the firmware.
-3. **Interact with Switches (Manual Override):** Click on any of the 5 slide switches to toggle their input states. You will see the corresponding red LEDs turn on and off immediately. This represents a user physically flipping a wall switch, which the ESP32 detects and responds to by triggering the load relay.
+3. **Interact with Switches (Manual Override):** Click on any of the 6 slide switches to toggle their input states. You will see the corresponding red LEDs turn on and off immediately. This represents a user physically flipping a wall switch, which the ESP32 detects and responds to by triggering the load relay.
 4. **Interact with the Sensor (Power Draw):** Click and drag the potentiometer slider left or right. This simulates fluctuating analog power consumption on Fan 1 (e.g., changing the fan speed). The ESP32 continuously reads this varying voltage to calculate simulated wattage.
 
 ## 3. Real-World to Simulation Mapping

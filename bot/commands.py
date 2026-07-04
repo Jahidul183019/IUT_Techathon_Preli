@@ -144,11 +144,11 @@ class DeviceCommands(commands.Cog):
         name_lower = name.lower().replace(" ", "").replace("_", "")
         
         slug = None
-        if "drawing" in name_lower:
+        if name_lower in ["drawing", "drawingroom", "dr"]:
             slug = "drawing_room"
-        elif "work1" in name_lower or "workroom1" in name_lower or "1" in name_lower:
+        elif name_lower in ["work1", "workroom1", "1", "wr1"]:
             slug = "work_room_1"
-        elif "work2" in name_lower or "workroom2" in name_lower or "2" in name_lower:
+        elif name_lower in ["work2", "workroom2", "2", "wr2"]:
             slug = "work_room_2"
             
         if not slug:

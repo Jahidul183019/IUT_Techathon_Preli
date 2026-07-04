@@ -103,7 +103,9 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
             <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider">
               Dynamic Daily Est.
             </p>
-            <p className="text-lg font-mono font-bold text-on-surface">{analyticsData ? analyticsData.estimated_kwh_today.toFixed(1) : '--'} kWh</p>
+            <p className="text-lg font-mono font-bold text-on-surface">
+              {analyticsData ? analyticsData.estimated_kwh_today.toFixed(1) : '--'} kWh
+            </p>
           </div>
         </div>
 
@@ -131,7 +133,9 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
             <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider">
               Grid Load Peak
             </p>
-            <p className="text-lg font-mono font-bold text-on-surface">{analyticsData ? (analyticsData.total_watts / 1000).toFixed(2) : '--'} kW</p>
+            <p className="text-lg font-mono font-bold text-on-surface">
+              {analyticsData ? (analyticsData.total_watts / 1000).toFixed(2) : '--'} kW
+            </p>
           </div>
         </div>
       </div>

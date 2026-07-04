@@ -83,8 +83,8 @@ export default function SecurityView() {
           </h2>
           <p className="text-xs text-on-surface-variant mt-1">
             Intrusion detection, physical locks, firewalls, and active CCTV perimeter feeds
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
-              Demo/Illustrative Only (Not wired to backend)
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 font-bold uppercase tracking-wider">
+              Demo Only (Coming Soon)
             </span>
           </p>
         </div>
