@@ -58,12 +58,12 @@ backend/
 
 ```json
 // Server → Client
-{"event": "snapshot",       "data": { "devices": [...], "usage": {...} }}
-{"event": "device_update",  "data": { "device_id": "dr_fan_1", "state": "on", "power": 45.2 }}
-{"event": "alert",          "data": { "device_id": "wr1_light_2", "message": "...", "severity": "critical" }}
+{"type": "snapshot",       "data": { "devices": [...], "usage": {...} }}
+{"type": "device_update",  "data": { "device_id": "dr_fan_1", "state": "on", "power": 45.2 }}
+{"type": "alert",          "data": { "device_id": "wr1_light_2", "message": "...", "severity": "critical" }}
 
 // Client → Server (dashboard only)
-{"event": "toggle",         "data": { "device_id": "dr_fan_1" }}
+{"type": "toggle",         "data": { "device_id": "dr_fan_1" }}
 ```
 
 ### 3. React Dashboard (Vite)
@@ -72,7 +72,7 @@ backend/
 - Receives `snapshot` → renders initial state
 - Receives `device_update` → patches local React state for that device
 - Receives `alert` → shows toast notification
-- User clicks toggle → sends `{"event": "toggle", ...}` over WS → backend mutates store → broadcasts `device_update` back to **all** clients (including this one)
+- User clicks toggle → sends `{"type": "toggle", ...}` over WS → backend mutates store → broadcasts `device_update` back to **all** clients (including this one)
 - Also can call REST endpoints for historical data (`GET /api/devices/stats/usage`)
 
 ### 4. Discord Bot (discord.py)
@@ -120,6 +120,7 @@ Use this table to draw each arrow precisely:
 | 11 | Discord Bot | REST Routes | `GET /api/devices/{room}` | **HTTP GET** |
 | 12 | Discord Bot | REST Routes | `GET /api/devices/stats/usage` | **HTTP GET** |
 | 13 | Discord Bot | REST Routes | `GET /api/devices/stats/alerts` | **HTTP GET** |
+| 14 | REST Routes | Discord Bot | JSON response | **HTTP 200** |
 | 15 | REST Routes | In-Memory Store | `read / mutate` | Internal function call |
 | 16 | WebSocket Hub | In-Memory Store | `toggle → mutate` | Internal function call |
 
