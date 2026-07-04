@@ -30,7 +30,7 @@ logger = logging.getLogger("alerts")
 WORK_HOUR_START: int = 9   # 09:00
 WORK_HOUR_END: int = 17    # 17:00
 CONTINUOUS_ON_THRESHOLD: timedelta = timedelta(hours=2)
-ALERT_COOLDOWN: timedelta = timedelta(minutes=10)  # same alert won't re-fire within this
+ALERT_COOLDOWN: timedelta = timedelta(minutes=60)  # same alert won't re-fire within this
 
 # Track recently fired alerts to avoid spam: { rule_key: last_fired_utc }
 _cooldowns: dict[str, datetime] = {}
