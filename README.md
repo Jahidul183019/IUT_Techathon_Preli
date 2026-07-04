@@ -19,6 +19,17 @@
 
 </div>
 
+## Team
+
+**DU_AlgoArchitects**
+
+| # | Member |
+|---|--------|
+| 1 | Md. Jahidul Islam Sarkar |
+| 2 | Shadman Zaman Sajid |
+| 3 | Md. Irfan Iqbal |
+| 4 | Swarlok Samadder |
+
 ## Project Highlights
 
 - **15-device IoT simulation**: 3 rooms, each with 2 fans and 3 lights.
