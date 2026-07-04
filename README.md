@@ -36,6 +36,7 @@
 |---------|-----|
 | Dashboard | [https://iot-smart-home-dashboard.onrender.com](https://iot-smart-home-dashboard.onrender.com) |
 | Backend | [https://iot-smart-home-backend-8au0.onrender.com](https://iot-smart-home-backend-8au0.onrender.com) |
+| Swagger UI | [https://iot-smart-home-backend-8au0.onrender.com/docs](https://iot-smart-home-backend-8au0.onrender.com/docs) |
 | Bot Service | [https://iot-smart-home-bot.onrender.com](https://iot-smart-home-bot.onrender.com) |
 
 ## Project Highlights
@@ -174,6 +175,7 @@ cp .env.example .env
 The script creates a backend virtual environment if needed, installs backend/frontend dependencies, and starts:
 
 - Backend: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
 - Dashboard: `http://localhost:3000`
 
 It also exports local dashboard URLs so the frontend points at your local backend instead of the deployed Render backend.
