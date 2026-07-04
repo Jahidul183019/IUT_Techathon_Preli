@@ -59,6 +59,66 @@ async def get_usage():
     }
 
 
+# ── GET /analytics — full analytics dashboard data ─────────────────────
+
+@router.get("/stats/analytics")
+async def get_analytics():
+    """Return full analytics data including historical curves and zone peaks."""
+    usage = device_store.get_usage()
+    
+    now = datetime.now(timezone.utc)
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    hours_elapsed = (now - midnight).total_seconds() / 3600
+    estimated_kwh = round((usage.total_watts * hours_elapsed) / 1000, 2)
+    
+    current_load = usage.total_watts
+    
+    # System max is 495W (15 devices). Hourly mock should reflect realistic subsets.
+    hourly_data = [
+        {"hour": "08:00", "load": 120, "solar": 20},
+        {"hour": "10:00", "load": 220, "solar": 80},
+        {"hour": "12:00", "load": 310, "solar": 150},
+        {"hour": "14:00", "load": 350, "solar": 180},
+        {"hour": "16:00", "load": 290, "solar": 120},
+        {"hour": "18:00", "load": 210, "solar": 40},
+        {"hour": "20:00", "load": 140, "solar": 0},
+        {"hour": "22:00", "load": current_load, "solar": 0},
+    ]
+
+    # Daily max is ~11.88 kWh (495W * 24h). Daily mock should stay below this.
+    daily_data = [
+        {"day": "Mon", "consumption": 6.2, "solar": 1.5},
+        {"day": "Tue", "consumption": 7.8, "solar": 2.1},
+        {"day": "Wed", "consumption": 8.4, "solar": 2.3},
+        {"day": "Thu", "consumption": 9.1, "solar": 2.5},
+        {"day": "Fri", "consumption": 8.2, "solar": 2.2},
+        {"day": "Sat", "consumption": 4.8, "solar": 0.8},
+        {"day": "Sun", "consumption": 3.5, "solar": 0.5},
+    ]
+
+    # According to problem statement: 2 fans (60W) + 3 lights (15W) = 165W peak per room
+    room_peak_limit = 165
+    
+    rooms_data = [
+        {
+            "name": r.room_name,
+            "current": r.current_watts,
+            "peak": room_peak_limit
+        }
+        for r in usage.rooms
+    ]
+
+    return {
+        "total_watts": usage.total_watts,
+        "total_devices": usage.total_devices,
+        "active_devices": usage.active_devices,
+        "estimated_kwh_today": estimated_kwh,
+        "hourly": hourly_data,
+        "daily": daily_data,
+        "rooms": rooms_data,
+    }
+
+
 # ── GET /alerts — active alerts ────────────────────────────────────────
 
 @router.get("/stats/alerts")
