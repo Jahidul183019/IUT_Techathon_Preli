@@ -60,7 +60,7 @@ The backend is intentionally the authority. The simulator, dashboard toggles, RE
 
 | Objective | Description |
 |-----------|-------------|
-| **Device Monitoring** | Track ON/OFF state for 18 simulated fans, lights across 3 rooms. |
+| **Device Monitoring** | Track ON/OFF state for 15 simulated fans, lights across 3 rooms. |
 | **Real-Time Visibility** | Push state changes instantly to the dashboard through WebSocket events. |
 | **Power Awareness** | Estimate live watts, active devices, room-level load, and daily kWh usage. |
 | **Alerting** | Flag after-hours device usage and full-room continuous-load conditions. |
@@ -133,7 +133,7 @@ The architecture diagram is maintained in [diagrams/](diagrams/) with committed 
 ### Data Flow
 
 1. The simulator in [backend/core/simulator.py](backend/core/simulator.py) periodically changes device state.
-2. The store in [backend/core/store.py](backend/core/store.py) keeps the authoritative 18-device inventory.
+2. The store in [backend/core/store.py](backend/core/store.py) keeps the authoritative 15-device inventory.
 3. Alert checks in [backend/core/alerts.py](backend/core/alerts.py) generate warning and critical alerts.
 4. REST routes in [backend/routes/devices.py](backend/routes/devices.py) expose devices, room data, usage, alerts, and toggles.
 5. The WebSocket endpoint in [backend/main.py](backend/main.py) sends `snapshot`, `device_update`, and `alert` messages.
@@ -349,7 +349,7 @@ project-root/
 - Dashboard toggles prefer WebSocket and fall back to REST if the socket is unavailable.
 - Alert deduplication uses a cooldown window to avoid repeated messages for the same condition.
 - The bot polls alerts once per minute, so Discord proactive alerts may lag the dashboard slightly.
-- The fixed inventory is enforced by seed data: 3 rooms x 6 devices = 18 devices.
+- The fixed inventory is enforced by seed data: 3 rooms x 5 devices = 15 devices.
 
 ---
 
