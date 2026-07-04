@@ -99,7 +99,7 @@ class DeviceCommands(commands.Cog):
     @commands.command()
     async def status(self, ctx: commands.Context):
         """Summarizes the status of all rooms in the smart home."""
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             try:
                 resp = await client.get(f"{BACKEND_URL}/api/devices")
                 if resp.status_code != 200:
@@ -155,7 +155,7 @@ class DeviceCommands(commands.Cog):
             await ctx.send(f"I couldn't figure out which room '{name}' is! My mapped rooms are: Drawing Room, Work Room 1, and Work Room 2.")
             return
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             try:
                 resp = await client.get(f"{BACKEND_URL}/api/devices/{slug}")
                 if resp.status_code == 404:
@@ -182,7 +182,7 @@ class DeviceCommands(commands.Cog):
     @commands.command(aliases=["power"])
     async def usage(self, ctx: commands.Context):
         """Check the current power consumption and daily estimate."""
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             try:
                 resp = await client.get(f"{BACKEND_URL}/api/devices/stats/usage")
                 if resp.status_code != 200:

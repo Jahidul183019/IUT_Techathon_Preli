@@ -66,7 +66,7 @@ async def setup_hook():
 async def poll_alerts():
     """Poll the backend for new alerts every minute and post them to Discord."""
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get(f"{BACKEND_URL}/api/devices/stats/alerts")
             if resp.status_code != 200:
                 return
