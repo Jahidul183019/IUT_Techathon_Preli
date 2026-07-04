@@ -30,6 +30,13 @@
 | 3 | Md. Irfan Iqbal |
 | 4 | Swarlok Samadder |
 
+## Project Links
+
+| Service | URL |
+|---------|-----|
+| Backend / Bot Service | [https://iot-smart-home-bot.onrender.com](https://iot-smart-home-bot.onrender.com) |
+| Dashboard | [https://iot-smart-home-dashboard.onrender.com](https://iot-smart-home-dashboard.onrender.com) |
+
 ## Project Highlights
 
 - **15-device IoT simulation**: 3 rooms, each with 2 fans and 3 lights.
