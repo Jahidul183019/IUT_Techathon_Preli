@@ -1,169 +1,47 @@
-# System Architecture — IoT Smart Home Monitor
+# System Architecture - Smart Home IoT Monitor
 
-## Overview
+This diagram shows the project at a presentation level: the simulator and hardware concept feed one FastAPI backend, the backend owns all device state, and the dashboard plus Discord bot consume that same source of truth.
 
-A real-time IoT monitoring platform with **15 simulated devices** across 3 rooms, a **FastAPI backend** as the single source of truth, and two consumer interfaces: a React dashboard that listens over WebSocket and a Discord bot that reads the same backend state through REST and alert polling.
+![Smart Home IoT Monitor architecture](./architecture.png)
 
----
+## Main Components
 
-## Component Breakdown
+| Layer | Component | Role |
+|---|---|---|
+| Inputs | Simulator | Generates live state changes for 15 devices across 3 rooms. |
+| Inputs | ESP32 / Wokwi concept | Documents the physical deployment model: switches, relays, and current sensing. |
+| Backend | FastAPI app | Starts the simulator, exposes health checks, configures CORS, and owns API wiring. |
+| Backend | API gateways | Provides REST endpoints under `/api/devices` and WebSocket streaming on `/ws`. |
+| Backend | DeviceStore singleton | Single source of truth for current device state, usage stats, and recent alerts. |
+| Backend | Alert engine | Checks after-hours usage and continuous-load conditions. |
+| Consumers | React dashboard | Uses WebSocket for live updates and REST for initial/fallback refreshes. |
+| Consumers | Discord bot | Uses REST commands and alert polling to report status in Discord. |
 
-### 1. Simulated Device Layer (inside backend process)
+## Flow Summary
 
-| Room | Fans | Lights | Total |
-|------|------|--------|-------|
-| Drawing Room | 2 | 3 | 5 |
-| Work Room 1 | 2 | 3 | 5 |
-| Work Room 2 | 2 | 3 | 5 |
+1. The simulator mutates device state inside the FastAPI process.
+2. All device reads and writes go through `DeviceStore`.
+3. The WebSocket endpoint streams snapshots, device updates, and alerts to the dashboard.
+4. REST endpoints serve dashboard fallback reads and Discord bot commands.
+5. The hardware circuit is documented as the physical model, but the current app uses the Python simulator as its live input.
 
-- **Not** a separate service — runs as an `asyncio` background task inside the FastAPI process.
-- The simulator loop ticks every N seconds:
-  1. Randomly picks a device
-  2. Flips its state (`on` ↔ `off`) or adjusts power consumption
-  3. Writes the new state to the **in-memory store**
-  4. Calls the **broadcast function** to push a `device_update` event to all WebSocket clients
-  5. Checks alert thresholds (e.g., power > limit) → if triggered, broadcasts an `alert` event
+## Files
 
-### 2. FastAPI Backend (single process, single source of truth)
+- Rendered PNG: [`architecture.png`](./architecture.png)
+- Rendered SVG: [`architecture.svg`](./architecture.svg)
+- Graphviz source: [`architecture.dot`](./architecture.dot)
 
-```
-backend/
-├── main.py              ← app entry, lifespan, WS endpoint
-├── core/
-│   ├── models.py        ← Pydantic: Device, Room, Alert, UsageStats
-│   ├── store.py         ← InMemoryStore singleton (the SSOT)
-│   ├── simulator.py     ← async loop that mutates store + broadcasts
-│   └── alerts.py        ← threshold engine, generates Alert objects
-└── routes/
-    └── devices.py       ← REST endpoints
-```
+## Regeneration
 
-**REST API (HTTP — request/response)**
+The committed SVG is hand-authored for a cleaner presentation view. To regenerate the PNG on macOS:
 
-| Endpoint | Method | Returns |
-|----------|--------|---------|
-| `/health` | GET | `{"status": "ok"}` |
-| `/api/devices` | GET | All 15 devices with current state |
-| `/api/devices/{room}` | GET | Devices filtered by room slug |
-| `/api/devices/{id}/toggle` | POST | Toggle a specific device, returns new state |
-| `/api/devices/stats/usage` | GET | Per-room and total power/energy stats |
-| `/api/devices/stats/alerts` | GET | List of recent alerts |
-
-**WebSocket Endpoint (`/ws`)**
-
-- Accepts connections from **any** client (dashboard, bot, or future clients)
-- On connect: sends a `snapshot` message with full device state
-- On store mutation: broadcasts to **all** connected clients
-- Message format (JSON):
-
-```json
-// Server → Client
-{"type": "snapshot",       "data": { "devices": [...], "usage": {...} }}
-{"type": "device_update",  "data": { "device_id": "dr_fan_1", "state": "on", "power": 45.2 }}
-{"type": "alert",          "data": { "device_id": "wr1_light_2", "message": "...", "severity": "critical" }}
-
-// Client → Server (dashboard only)
-{"type": "toggle",         "data": { "device_id": "dr_fan_1" }}
+```bash
+sips -s format png diagrams/architecture.svg --out diagrams/architecture.png
 ```
 
-### 3. React Dashboard (Vite)
+If Graphviz is installed, `architecture.dot` can also be rendered as an alternate detailed view:
 
-- Connects to `ws://backend/ws` on mount
-- Receives `snapshot` → renders initial state
-- Receives `device_update` → patches local React state for that device
-- Receives `alert` → shows toast notification
-- User clicks toggle → sends `{"type": "toggle", ...}` over WS → backend mutates store → broadcasts `device_update` back to **all** clients (including this one)
-- Also can call REST endpoints for historical data (`GET /api/devices/stats/usage`)
-
-### 4. Discord Bot (discord.py)
-
-- **REST consumer**: calls `GET /api/devices`, `GET /api/devices/{room}`, and `GET /api/devices/stats/usage` via `httpx`
-- **Alert poller**: checks `GET /api/devices/stats/alerts` in the background and sends proactive Discord channel messages
-- Commands: `!status`, `!room <name>`, `!usage`
-
----
-
-## Data Flow Diagram
-
-![IoT Smart Home Monitor — System Architecture](./architecture.png)
-
-> **Source of truth for this diagram:** [`architecture.dot`](./architecture.dot) — a Graphviz DOT file. Every arrow below is mirrored 1-to-1 in the PNG so the diagram and the table can never drift apart.
->
-> **To regenerate** (requires Graphviz):
-> ```bash
-> dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
-> dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
-> ```
->
-> Both PNG and SVG are committed alongside the DOT source.
-
-*Mermaid was intentionally not used — the problem statement explicitly forbids it. Graphviz DOT was chosen because it is plain text (version-controllable, diff-able) and renders deterministically to a polished PNG/SVG.*
-
----
-
-## Labelled Arrow Reference (for draw.io / Excalidraw)
-
-Use this table to draw each arrow precisely:
-
-| # | From | To | Label | Protocol |
-|---|------|----|-------|----------|
-| 1 | Simulator Loop | In-Memory Store | `write new state` | Internal function call |
-| 2 | Simulator Loop | WebSocket Hub | `device_update` | Internal → WS broadcast |
-| 3 | In-Memory Store | Alert Engine | `check thresholds` | Internal function call |
-| 4 | Alert Engine | In-Memory Store | `store alert` | Internal function call |
-| 5 | Alert Engine | WebSocket Hub | `alert` | Internal → WS broadcast |
-| 6 | WebSocket Hub | React Dashboard | `snapshot` / `device_update` / `alert` | **WebSocket (JSON)** |
-| 7 | React Dashboard | WebSocket Hub | `toggle` | **WebSocket (JSON)** |
-| 8 | React Dashboard | REST Routes | `GET /api/devices/stats/usage` | **HTTP GET** |
-| 9 | REST Routes | React Dashboard | JSON response | **HTTP 200** |
-| 10 | Discord Bot | REST Routes | `GET /api/devices` | **HTTP GET** |
-| 11 | Discord Bot | REST Routes | `GET /api/devices/{room}` | **HTTP GET** |
-| 12 | Discord Bot | REST Routes | `GET /api/devices/stats/usage` | **HTTP GET** |
-| 13 | Discord Bot | REST Routes | `GET /api/devices/stats/alerts` | **HTTP GET** |
-| 14 | REST Routes | Discord Bot | JSON response | **HTTP 200** |
-| 15 | REST Routes | In-Memory Store | `read / mutate` | Internal function call |
-| 16 | WebSocket Hub | In-Memory Store | `toggle → mutate` | Internal function call |
-
----
-
-## Single Source of Truth — Why Clients Never Diverge
-
+```bash
+dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
+dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
 ```
-┌─────────────────────────────────────────────────┐
-│                 In-Memory Store                  │
-│          (Python dict in backend process)        │
-│                                                  │
-│  • Only the backend mutates state               │
-│  • REST reads are always from this store         │
-│  • WebSocket broadcasts originate from mutations │
-│    to this store                                 │
-│  • Dashboard/Bot NEVER hold authoritative state  │
-└─────────────────────────────────────────────────┘
-```
-
-> [!IMPORTANT]
-> **Both the dashboard and the bot are read-only mirrors.** Neither caches state independently. Every mutation (simulator tick, user toggle) goes through the backend, which:
-> 1. Updates the store (single write path)
-> 2. Broadcasts the change to **all** connected WS clients simultaneously
->
-> This means the dashboard and bot always converge — they receive the **same** `device_update` event from the **same** broadcast call. There's no separate "bot state" vs "dashboard state."
-
-### Why this is safe:
-
-| Concern | Resolution |
-|---------|------------|
-| **Stale reads** | REST always reads from the live store, not a cache |
-| **Split brain** | Impossible — only one process, one store, one broadcast |
-| **Toggle race** | Toggle is a server-side mutation → broadcasts result to all → eventual consistency in < 1 tick |
-| **Reconnection** | On WS connect, server sends `snapshot` with full current state |
-| **Bot offline** | Misses events, but next REST call or WS reconnect gets fresh data |
-
----
-
-## Sequence: User Toggles a Device from Dashboard
-
-[Note: Sequence diagram removed to comply with hackathon rules. See the text description above.]
-
-## Sequence: Simulator Auto-Flips a Device
-
-[Note: Sequence diagram removed to comply with hackathon rules. See the text description above.]

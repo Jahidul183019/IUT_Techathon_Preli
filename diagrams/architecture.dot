@@ -1,116 +1,245 @@
-// IoT Smart Home Monitor — System Architecture
-// Renders the full data flow from the labelled arrow reference table
-// in diagrams/architecture.md. Run with:
-//   dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
+// Smart Home IoT Monitor - Overall Architecture
+// Source for diagrams/architecture.svg and diagrams/architecture.png.
+// Regenerate with Graphviz when available:
 //   dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
+//   dot -Tpng diagrams/architecture.dot -o diagrams/architecture.png
 
 digraph Architecture {
-    // ── Layout ──────────────────────────────────────────────────────
-    rankdir=LR;
-    splines=polyline;
-    nodesep=0.55;
-    ranksep=1.2;
-    bgcolor="white";
-    fontname="Helvetica";
-    label="IoT Smart Home Monitor — System Architecture\nData flow: 15 simulated devices → backend → dashboard + Discord bot";
-    labelloc="t";
-    fontsize=18;
-    fontcolor="#1f2937";
+    graph [
+        rankdir=LR,
+        bgcolor="#f8fafc",
+        compound=true,
+        splines=ortho,
+        nodesep=0.55,
+        ranksep=0.95,
+        pad=0.25,
+        label="Smart Home IoT Monitor - Overall Architecture",
+        labelloc=t,
+        fontsize=24,
+        fontname="Helvetica-Bold",
+        fontcolor="#0f172a"
+    ];
 
-    // ── Default node style ──────────────────────────────────────────
     node [
         shape=box,
         style="rounded,filled",
         fontname="Helvetica",
         fontsize=12,
-        color="#475569",
-        penwidth=1.5,
+        color="#334155",
+        penwidth=1.4,
+        margin="0.12,0.08"
     ];
 
-    // ── Default edge style ──────────────────────────────────────────
     edge [
         fontname="Helvetica",
-        fontsize=9,
+        fontsize=10,
         color="#475569",
-        penwidth=1.2,
-        arrowsize=0.7,
+        penwidth=1.3,
+        arrowsize=0.7
     ];
 
-    // ── Cluster: Device / Sim layer ────────────────────────────────
-    subgraph cluster_device {
-        label="Device / Simulated Data Layer";
+    subgraph cluster_sources {
+        label="Device and Input Layer";
         style="rounded,filled";
-        fillcolor="#fef3c7";
-        color="#f59e0b";
-        fontcolor="#92400e";
-        fontsize=13;
+        fillcolor="#fff7ed";
+        color="#fb923c";
+        fontcolor="#9a3412";
+        fontsize=15;
 
-        SIM [label="Simulator Loop\n(asyncio task)\nbackend/core/simulator.py",
-             fillcolor="#fde68a"];
+        simulator [
+            label="Python Simulator\nbackend/core/simulator.py\n15 devices, 3 rooms, 4s ticks",
+            fillcolor="#fed7aa"
+        ];
+
+        hardware [
+            label="ESP32 / Wokwi Hardware Concept\ncircuit/diagram.json\n1 room: switches, relays, current sensor",
+            fillcolor="#ffedd5"
+        ];
     }
 
-    // ── Cluster: Backend (Single Source of Truth) ───────────────────
     subgraph cluster_backend {
-        label="FastAPI Backend  (Single Source of Truth)";
+        label="FastAPI Backend - Single Source of Truth";
         style="rounded,filled";
-        fillcolor="#dbeafe";
+        fillcolor="#eff6ff";
         color="#3b82f6";
         fontcolor="#1e3a8a";
-        fontsize=13;
+        fontsize=15;
 
-        STORE [label="In-Memory Store\n(DeviceStore singleton)\nbackend/core/store.py",
-               fillcolor="#bfdbfe"];
-        ALERTS [label="Alert Engine\nbackend/core/alerts.py",
-                fillcolor="#bfdbfe"];
-        WSHUB  [label="WebSocket Hub\n/ ws\nbackend/main.py",
-                fillcolor="#bfdbfe"];
-        REST   [label="REST Routes\n/ api/devices\nbackend/routes/devices.py",
-                fillcolor="#bfdbfe"];
+        api [
+            label="FastAPI App\nbackend/main.py\nCORS, lifespan, health, /ws",
+            fillcolor="#bfdbfe"
+        ];
+
+        store [
+            label="DeviceStore Singleton\nbackend/core/store.py\ncurrent state, usage, recent alerts",
+            fillcolor="#dbeafe",
+            penwidth=2.2,
+            color="#1d4ed8"
+        ];
+
+        alerts [
+            label="Alert Engine\nbackend/core/alerts.py\nafter-hours + continuous-room rules",
+            fillcolor="#dbeafe"
+        ];
+
+        rest [
+            label="REST API\nbackend/routes/devices.py\n/api/devices, usage, alerts, toggle",
+            fillcolor="#bfdbfe"
+        ];
+
+        ws [
+            label="WebSocket Hub\n/ws\nsnapshot, device_update, alert, pong",
+            fillcolor="#bfdbfe"
+        ];
     }
 
-    // ── Cluster: Clients ────────────────────────────────────────────
     subgraph cluster_clients {
-        label="Client Interfaces";
+        label="Application Interfaces";
         style="rounded,filled";
-        fillcolor="#dcfce7";
-        color="#22c55e";
-        fontcolor="#14532d";
-        fontsize=13;
+        fillcolor="#ecfdf5";
+        color="#10b981";
+        fontcolor="#065f46";
+        fontsize=15;
 
-        DASH  [label="React Dashboard\n(Vite + WebSocket)\ndashboard/src/",
-               fillcolor="#bbf7d0"];
-        BOT   [label="Discord Bot\n(discord.py + REST polling)\nbot/",
-               fillcolor="#bbf7d0"];
-        USER  [label="Boss / User",
-               shape=octagon,
-               fillcolor="#86efac"];
+        dashboard [
+            label="React Dashboard\nVite + TypeScript\ndashboard/src/",
+            fillcolor="#bbf7d0"
+        ];
+
+        bot [
+            label="Discord Bot\ndiscord.py + httpx\nbot/",
+            fillcolor="#bbf7d0"
+        ];
+
+        user [
+            label="User / Office Admin\nlive UI + Discord commands",
+            shape=octagon,
+            fillcolor="#86efac"
+        ];
     }
 
-    // ── Labelled arrows (matches architecture.md table) ─────────────
-    // Internal function calls
-    SIM    -> STORE  [label="1. write new state\n(internal call)",          style=dashed, color="#0ea5e9"];
-    SIM    -> WSHUB  [label="2. device_update\n(WS broadcast)",             color="#0ea5e9"];
-    STORE  -> ALERTS [label="3. check thresholds\n(internal call)",          style=dashed, color="#0ea5e9"];
-    ALERTS -> STORE  [label="4. store alert\n(internal call)",               style=dashed, color="#0ea5e9"];
-    ALERTS -> WSHUB  [label="5. alert\n(WS broadcast)",                       color="#0ea5e9"];
+    subgraph cluster_external {
+        label="External Services and Hosting";
+        style="rounded,filled";
+        fillcolor="#f5f3ff";
+        color="#8b5cf6";
+        fontcolor="#5b21b6";
+        fontsize=15;
 
-    // Dashboard ↔ Backend
-    WSHUB  -> DASH   [label="6. snapshot / device_update / alert\nWS (JSON)", color="#7c3aed", penwidth=2];
-    DASH   -> WSHUB  [label="7. toggle\nWS (JSON)",                          color="#7c3aed", penwidth=2];
-    DASH   -> REST   [label="8. GET /api/devices/stats/usage\nHTTP GET",    color="#7c3aed"];
-    REST   -> DASH   [label="9. JSON response\nHTTP 200",                    color="#7c3aed"];
+        vercel [
+            label="Vercel\nDashboard hosting\nVITE_API_URL / VITE_WS_URL",
+            fillcolor="#ddd6fe"
+        ];
 
-    // Bot ↔ Backend
-    BOT    -> REST   [label="10. GET /api/devices\nHTTP GET",                 color="#dc2626"];
-    BOT    -> REST   [label="11. GET /api/devices/{room}\nHTTP GET",          color="#dc2626"];
-    BOT    -> REST   [label="12. GET /api/devices/stats/usage\nHTTP GET",     color="#dc2626"];
-    BOT    -> REST   [label="13. GET /api/devices/stats/alerts\nHTTP GET",    color="#dc2626"];
+        render [
+            label="Render\nBackend and bot targets\nhealth endpoints",
+            fillcolor="#ddd6fe"
+        ];
 
-    // Backend internal (REST + WS mutate store)
-    REST   -> STORE  [label="15. read / mutate\n(internal call)",             style=dashed, color="#0ea5e9"];
-    WSHUB  -> STORE  [label="16. toggle → mutate\n(internal call)",           style=dashed, color="#0ea5e9"];
+        llm [
+            label="Gemini / Groq APIs\noptional bot response rewrite",
+            fillcolor="#ede9fe"
+        ];
 
-    // ── User observation arrows (legend) ────────────────────────────
-    DASH   -> USER   [label="sees live UI", style=dotted, color="#475569"];
-    BOT    -> USER   [label="reads !status\n!room !usage",  style=dotted, color="#475569"];
+        discord [
+            label="Discord Platform\nmessages, commands, alert channel",
+            fillcolor="#ede9fe"
+        ];
+    }
+
+    simulator -> store [
+        label="mutates device state"
+    ];
+    simulator -> alerts [
+        label="runs alert checks after ticks"
+    ];
+    simulator -> ws [
+        label="broadcasts device_update"
+    ];
+    hardware -> simulator [
+        label="physical deployment model\n(currently simulated)",
+        style=dashed
+    ];
+
+    api -> ws [
+        label="owns connection manager"
+    ];
+    api -> rest [
+        label="mounts router"
+    ];
+    rest -> store [
+        label="read devices / usage / alerts\nPOST toggle mutates state"
+    ];
+    ws -> store [
+        label="snapshot on connect\ntoggle message mutates"
+    ];
+    alerts -> store [
+        label="stores generated alerts"
+    ];
+    alerts -> ws [
+        label="broadcasts alert events"
+    ];
+    rest -> ws [
+        label="REST toggle rebroadcasts update"
+    ];
+
+    dashboard -> rest [
+        label="initial REST refresh + fallback toggle\nHTTP JSON",
+        color="#2563eb"
+    ];
+    rest -> dashboard [
+        label="devices, usage, alerts",
+        color="#2563eb"
+    ];
+    ws -> dashboard [
+        label="snapshot, updates, alerts\nWebSocket JSON",
+        color="#7c3aed",
+        penwidth=2.0
+    ];
+    dashboard -> ws [
+        label="toggle, ping\nWebSocket JSON",
+        color="#7c3aed",
+        penwidth=2.0
+    ];
+
+    bot -> rest [
+        label="!status, !room, !usage\nalert polling",
+        color="#dc2626"
+    ];
+    rest -> bot [
+        label="JSON responses",
+        color="#dc2626"
+    ];
+    bot -> llm [
+        label="optional friendly summaries",
+        style=dashed
+    ];
+    bot -> discord [
+        label="posts command replies + alerts"
+    ];
+    discord -> bot [
+        label="user commands"
+    ];
+
+    dashboard -> user [
+        label="live monitoring and toggles",
+        style=dotted
+    ];
+    discord -> user [
+        label="chat operations",
+        style=dotted
+    ];
+
+    vercel -> dashboard [
+        label="serves static app",
+        style=dashed
+    ];
+    render -> api [
+        label="runs backend",
+        style=dashed
+    ];
+    render -> bot [
+        label="runs bot worker/web service",
+        style=dashed
+    ];
 }
