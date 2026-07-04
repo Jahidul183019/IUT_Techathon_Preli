@@ -22,7 +22,7 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/stats/analytics`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://iot-smart-home-backend-8au0.onrender.com'}/api/devices/stats/analytics`);
         if (response.ok) {
           const data = await response.json();
           setAnalyticsData(data);
