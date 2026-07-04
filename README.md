@@ -30,7 +30,7 @@ project-root/
 │   │   ├── components/
 │   │   │   ├── OfficeFloorplan.tsx     # Visual 3-room layout with smart grid
 │   │   │   ├── PowerInsight.tsx        # Live wattage and kWh estimation
-│   │   │   ├── SupportModal.tsx        # Fetches dynamic /contacts
+│   │   │   ├── SupportModal.tsx        # System info & support contacts
 │   │   │   └── ...                     # Other UI views
 │   │   └── hooks/
 │   └── package.json  # NPM dependencies

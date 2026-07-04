@@ -62,6 +62,8 @@ class DeviceStore:
                 last_changed=now,
             )
             self._devices[device.id] = device
+            if device.id in initially_on:
+                self._turned_on_at[device.id] = now
 
         assert len(self._devices) == 15, (
             f"Store must hold exactly 15 devices, got {len(self._devices)}"
