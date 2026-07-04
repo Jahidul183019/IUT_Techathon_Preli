@@ -9,6 +9,7 @@ import os
 import asyncio
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlparse
 import httpx
 import discord
 from discord.ext import commands, tasks
@@ -19,14 +20,15 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 def run_health_server():
     class HealthHandler(BaseHTTPRequestHandler):
         def do_GET(self):
-            if self.path in ("/", "/health"):
+            parsed_path = urlparse(self.path).path
+            if parsed_path in ("/", "/health"):
                 body = b"Bot is online and healthy"
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
-            elif self.path == "/check-llm":
+            elif parsed_path == "/check-llm":
                 import json
                 keys_status = {
                     "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
@@ -45,12 +47,13 @@ def run_health_server():
                 self.end_headers()
                 
         def do_HEAD(self):
-            if self.path in ("/", "/health"):
+            parsed_path = urlparse(self.path).path
+            if parsed_path in ("/", "/health"):
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
                 self.send_header("Content-Length", str(len(b"Bot is online and healthy")))
                 self.end_headers()
-            elif self.path == "/check-llm":
+            elif parsed_path == "/check-llm":
                 import json
                 keys_status = {
                     "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
