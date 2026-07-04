@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import { BarChart3, TrendingUp, Cpu, BatteryCharging, Zap } from 'lucide-react';
 import { Device } from '../types';
@@ -9,46 +9,37 @@ interface AnalyticsViewProps {
 
 export default function AnalyticsView({ devices }: AnalyticsViewProps) {
   const [timeframe, setTimeframe] = useState<'hourly' | 'daily'>('hourly');
+  const [analyticsData, setAnalyticsData] = useState<{
+    total_watts: number;
+    active_devices: number;
+    total_devices: number;
+    estimated_kwh_today: number;
+    hourly: { hour: string; load: number; solar: number }[];
+    daily: { day: string; consumption: number; solar: number }[];
+    rooms: { name: string; current: number; peak: number }[];
+  } | null>(null);
 
-  // Dynamic calculation for real values based on current state
-  const totalOnWattage = devices
-    .filter((d) => d.status === 'ON')
-    .reduce((sum, d) => sum + d.wattage, 0);
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/stats/analytics`);
+        if (response.ok) {
+          const data = await response.json();
+          setAnalyticsData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch analytics data:', error);
+      }
+    };
 
-  const getRoomPower = (roomName: Device['room']) => {
-    return devices
-      .filter((d) => d.room === roomName && d.status === 'ON')
-      .reduce((sum, d) => sum + d.wattage, 0);
-  };
+    fetchAnalytics();
+    const interval = setInterval(fetchAnalytics, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
-  // Mock historical curve that offsets depending on current active load to feel "alive"
-  const hourlyData = [
-    { hour: '08:00', load: 150, solar: 20 },
-    { hour: '10:00', load: 310, solar: 120 },
-    { hour: '12:00', load: 450 + (totalOnWattage / 2), solar: 210 },
-    { hour: '14:00', load: 380 + (totalOnWattage / 3), solar: 260 },
-    { hour: '16:00', load: 410 + (totalOnWattage * 0.4), solar: 180 },
-    { hour: '18:00', load: 280 + (totalOnWattage * 0.5), solar: 40 },
-    { hour: '20:00', load: 210 + (totalOnWattage * 0.7), solar: 0 },
-    { hour: '22:00', load: totalOnWattage, solar: 0 },
-  ];
-
-  const dailyData = [
-    { day: 'Mon', consumption: 10.2, solar: 1.5 },
-    { day: 'Tue', consumption: 11.8, solar: 2.1 },
-    { day: 'Wed', consumption: 12.4, solar: 2.3 },
-    { day: 'Thu', consumption: 14.1, solar: 2.5 },
-    { day: 'Fri', consumption: 13.2, solar: 2.2 },
-    { day: 'Sat', consumption: 6.8, solar: 0.8 },
-    { day: 'Sun', consumption: 5.5, solar: 0.5 },
-  ];
-
-  // Dynamic room bars representing live loads
-  const roomData = [
-    { name: 'Drawing Room', current: getRoomPower('Drawing Room'), peak: 350 },
-    { name: 'Work Room 1', current: getRoomPower('Work Room 1'), peak: 650 },
-    { name: 'Work Room 2', current: getRoomPower('Work Room 2'), peak: 220 },
-  ];
+  const hourlyData = analyticsData?.hourly ?? [];
+  const dailyData = analyticsData?.daily ?? [];
+  const roomData = analyticsData?.rooms ?? [];
 
   return (
     <div className="space-y-6 text-on-surface">
@@ -99,7 +90,7 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
             <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider">
               Live Total Load
             </p>
-            <p className="text-lg font-mono font-bold text-on-surface">{totalOnWattage} W</p>
+            <p className="text-lg font-mono font-bold text-on-surface">{analyticsData ? analyticsData.total_watts : '--'} W</p>
           </div>
         </div>
 
@@ -112,7 +103,7 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
             <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider">
               Dynamic Daily Est.
             </p>
-            <p className="text-lg font-mono font-bold text-on-surface">12.4 kWh</p>
+            <p className="text-lg font-mono font-bold text-on-surface">{analyticsData ? analyticsData.estimated_kwh_today.toFixed(1) : '--'} kWh</p>
           </div>
         </div>
 
@@ -126,7 +117,7 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
               Total Active Nodes
             </p>
             <p className="text-lg font-mono font-bold text-on-surface">
-              {devices.filter((d) => d.status === 'ON').length}/{devices.length}
+              {analyticsData ? `${analyticsData.active_devices}/${analyticsData.total_devices}` : '--/--'}
             </p>
           </div>
         </div>
@@ -140,7 +131,7 @@ export default function AnalyticsView({ devices }: AnalyticsViewProps) {
             <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider">
               Grid Load Peak
             </p>
-            <p className="text-lg font-mono font-bold text-on-surface">1.2 kW</p>
+            <p className="text-lg font-mono font-bold text-on-surface">{analyticsData ? (analyticsData.total_watts / 1000).toFixed(2) : '--'} kW</p>
           </div>
         </div>
       </div>
