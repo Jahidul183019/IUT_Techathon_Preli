@@ -43,7 +43,7 @@
 
 ## Project Highlights
 
-- **18-device IoT simulation**: 3 rooms, each with 2 fans, 3 lights, and 1 AC.
+- **15-device IoT simulation**: 3 rooms, each with 2 fans, 3 lights, and 1 AC.
 - **Single source of truth**: all device state lives in the FastAPI in-memory store.
 - **Live dashboard**: React/Vite interface receives snapshots, device updates, and alerts over WebSocket.
 - **Discord operations bot**: `!status`, `!room`, and `!usage` commands read the same backend data through REST.
