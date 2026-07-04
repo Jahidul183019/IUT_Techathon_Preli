@@ -27,16 +27,47 @@ async def list_devices():
     }
 
 
-# ── GET /devices/contacts — dummy contacts ──────────────────────────
 
-@router.get("/contacts")
-async def get_contacts():
+# ── GET /usage — power consumption stats ──────────────────────────────
+
+@router.get("/stats/usage")
+async def get_usage():
+    """
+    Return total watts currently drawn, per-room breakdown,
+    and today's estimated kWh.
+
+    Estimated kWh = current_watts × hours_elapsed_today / 1000
+    This is a rough estimate assuming current draw has been constant —
+    fine for a demo, not for production billing.
+    """
+    usage = device_store.get_usage()
+
+    # Estimate today's kWh
+    now = datetime.now(timezone.utc)
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    hours_elapsed = (now - midnight).total_seconds() / 3600
+
+    estimated_kwh = round((usage.total_watts * hours_elapsed) / 1000, 2)
+
     return {
+        "total_watts": usage.total_watts,
+        "total_devices": usage.total_devices,
+        "active_devices": usage.active_devices,
+        "estimated_kwh_today": estimated_kwh,
+        "hours_elapsed_today": round(hours_elapsed, 1),
+        "rooms": [r.model_dump(mode="json") for r in usage.rooms],
+    }
 
-        "contacts": [
-            { "name": "IT Support Desk", "email": "it-support@office.local", "phone": "Ext. 101" },
-            { "name": "Facilities Manager", "email": "facilities@office.local", "phone": "Ext. 102" }
-        ]
+
+# ── GET /alerts — active alerts ────────────────────────────────────────
+
+@router.get("/stats/alerts")
+async def get_alerts(limit: int = 20):
+    """Return the most recent alerts, newest first."""
+    alerts = device_store.get_alerts(limit=limit)
+    return {
+        "count": len(alerts),
+        "alerts": [a.model_dump(mode="json") for a in alerts],
     }
 
 
@@ -100,48 +131,5 @@ async def toggle_device(device_id: str):
     return {
         "message": f"{device.name} turned {'ON' if device.status else 'OFF'}",
         "device": device.model_dump(mode="json"),
-    }
-
-
-# ── GET /usage — power consumption stats ──────────────────────────────
-
-@router.get("/stats/usage")
-async def get_usage():
-    """
-    Return total watts currently drawn, per-room breakdown,
-    and today's estimated kWh.
-
-    Estimated kWh = current_watts × hours_elapsed_today / 1000
-    This is a rough estimate assuming current draw has been constant —
-    fine for a demo, not for production billing.
-    """
-    usage = device_store.get_usage()
-
-    # Estimate today's kWh
-    now = datetime.now(timezone.utc)
-    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    hours_elapsed = (now - midnight).total_seconds() / 3600
-
-    estimated_kwh = round((usage.total_watts * hours_elapsed) / 1000, 2)
-
-    return {
-        "total_watts": usage.total_watts,
-        "total_devices": usage.total_devices,
-        "active_devices": usage.active_devices,
-        "estimated_kwh_today": estimated_kwh,
-        "hours_elapsed_today": round(hours_elapsed, 1),
-        "rooms": [r.model_dump(mode="json") for r in usage.rooms],
-    }
-
-
-# ── GET /alerts — active alerts ────────────────────────────────────────
-
-@router.get("/stats/alerts")
-async def get_alerts(limit: int = 20):
-    """Return the most recent alerts, newest first."""
-    alerts = device_store.get_alerts(limit=limit)
-    return {
-        "count": len(alerts),
-        "alerts": [a.model_dump(mode="json") for a in alerts],
     }
 

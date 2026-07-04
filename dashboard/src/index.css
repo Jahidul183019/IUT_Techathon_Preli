@@ -81,3 +81,19 @@
   background: #414754;
   border-radius: 2px;
 }
+
+/* Fan spinning animation when ON */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 2s linear infinite;
+}
+
+/* Light glow effect when ON */
+.glow-active {
+  filter: drop-shadow(0 0 6px currentColor);
+  opacity: 1;
+}
+

@@ -133,11 +133,14 @@ def check_continuous_full_room(now: datetime | None = None) -> list[Alert]:
         if not all(d.status for d in devices):
             continue
 
-        # Check if the oldest last_changed is 2+ hours ago
-        # (meaning all have been ON for at least that long)
-        oldest_change = min(d.last_changed for d in devices)
-
-        # Handle naive vs aware datetimes
+        # Check if all devices have a recorded turn-on time
+        # and the oldest one is 2+ hours ago
+        turned_on_times = [
+            device_store.get_turned_on_at(d.id) for d in devices
+        ]
+        if any(t is None for t in turned_on_times):
+            continue  # at least one device has no recorded turn-on time
+        oldest_change = min(turned_on_times)
         if oldest_change.tzinfo is None:
             oldest_change = oldest_change.replace(tzinfo=timezone.utc)
 

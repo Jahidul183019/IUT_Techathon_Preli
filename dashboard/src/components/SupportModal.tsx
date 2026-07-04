@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, HelpCircle, FileText, Settings, PhoneCall, ShieldAlert, ServerCog } from 'lucide-react';
+import { X, HelpCircle, FileText, PhoneCall, ShieldAlert, ServerCog } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SupportModalProps {
@@ -7,27 +6,12 @@ interface SupportModalProps {
   onClose: () => void;
 }
 
+const SUPPORT_CONTACTS = [
+  { name: 'IT Support', email: 'support@office.local', phone: 'Ext. 101' },
+  { name: 'Facilities', email: 'facilities@office.local', phone: 'Ext. 102' },
+];
+
 export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
-  const [contacts, setContacts] = React.useState<{name: string, email: string, phone: string}[]>([]);
-
-  React.useEffect(() => {
-    if (isOpen) {
-      const fetchContacts = async () => {
-        try {
-          const API_URL = import.meta.env.VITE_API_URL || 'https://iot-smart-home-backend-8au0.onrender.com';
-          const res = await fetch(`${API_URL}/api/devices/contacts`);
-          if (res.ok) {
-            const data = await res.json();
-            setContacts(data.contacts || []);
-          }
-        } catch (e) {
-          console.error('Failed to fetch contacts', e);
-        }
-      };
-      fetchContacts();
-    }
-  }, [isOpen]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -66,24 +50,22 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
                   <div>System ID: <span className="text-on-surface">SMART-HOME-MONITOR-01</span></div>
                   <div>Deployment: <span className="text-on-surface">Local Network</span></div>
                   <div>UI Version: <span className="text-on-surface">v1.0.0</span></div>
-                  <div>Admin: <span className="text-on-surface">{contacts.length > 0 ? contacts[0].email : 'admin@localhost'}</span></div>
+                  <div>Admin: <span className="text-on-surface">{SUPPORT_CONTACTS[0].email}</span></div>
                 </div>
               </div>
 
-              {/* Dynamic Contacts */}
-              {contacts.length > 0 && (
-                <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2">
-                  <p className="font-mono text-xs uppercase text-primary font-bold">Support Contacts</p>
-                  <div className="space-y-2">
-                    {contacts.map((c, i) => (
-                      <div key={i} className="text-xs font-mono text-on-surface-variant flex justify-between">
-                        <span className="text-on-surface font-bold">{c.name}</span>
-                        <span>{c.phone}</span>
-                      </div>
-                    ))}
-                  </div>
+              {/* Support Contacts */}
+              <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2">
+                <p className="font-mono text-xs uppercase text-primary font-bold">Support Contacts</p>
+                <div className="space-y-2">
+                  {SUPPORT_CONTACTS.map((c, i) => (
+                    <div key={i} className="text-xs font-mono text-on-surface-variant flex justify-between">
+                      <span className="text-on-surface font-bold">{c.name}</span>
+                      <span>{c.phone}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
 
               {/* FAQ Section */}
               <div className="space-y-3 pt-2">
@@ -115,7 +97,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
               {/* Support Hotline info */}
               <div className="flex gap-4 pt-2 border-t border-outline-variant/50">
                 <a
-                  href={`mailto:${contacts.length > 0 ? contacts[0].email : 'admin@localhost'}`}
+                  href={`mailto:${SUPPORT_CONTACTS[0].email}`}
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-surface-variant hover:bg-surface-container-high border border-outline-variant rounded-lg text-xs font-mono uppercase tracking-wider transition-colors"
                 >
                   <PhoneCall className="w-4 h-4 text-primary" /> Contact Admin

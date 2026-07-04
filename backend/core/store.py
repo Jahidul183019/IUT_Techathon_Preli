@@ -5,7 +5,7 @@ Singleton pattern: import `device_store` from anywhere (routes, bot, simulator)
 and you get the same instance with the same state.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.models import (
     Alert,
@@ -33,6 +33,7 @@ class DeviceStore:
     def __init__(self) -> None:
         self._devices: dict[str, Device] = {}
         self._alerts: list[Alert] = []
+        self._turned_on_at: dict[str, datetime] = {}
         self._seed()
 
     # ── Seeding ────────────────────────────────────────────────────────
@@ -49,7 +50,7 @@ class DeviceStore:
             # (nothing added)
         }
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for seed in DEVICE_SEED:
             device = Device(
                 id=seed["id"],
@@ -110,8 +111,12 @@ class DeviceStore:
         # Pydantic models are immutable by default — rebuild with new values
         updated = device.model_copy(update={
             "status": not device.status,
-            "last_changed": datetime.utcnow(),
+            "last_changed": datetime.now(timezone.utc),
         })
+        if updated.status and not device.status:   # OFF → ON transition
+            self._turned_on_at[updated.id] = datetime.now(timezone.utc)
+        elif not updated.status:                    # any → OFF transition
+            self._turned_on_at.pop(updated.id, None)
         self._devices[device_id] = updated
         return updated
 
@@ -129,10 +134,18 @@ class DeviceStore:
 
         updated = device.model_copy(update={
             "status": status,
-            "last_changed": datetime.utcnow(),
+            "last_changed": datetime.now(timezone.utc),
         })
+        if updated.status and not device.status:   # OFF → ON transition
+            self._turned_on_at[updated.id] = datetime.now(timezone.utc)
+        elif not updated.status:                    # any → OFF transition
+            self._turned_on_at.pop(updated.id, None)
         self._devices[device_id] = updated
         return updated
+
+    def get_turned_on_at(self, device_id: str) -> datetime | None:
+        """Return when the device was most recently turned ON, or None."""
+        return self._turned_on_at.get(device_id)
 
     # ── Usage / Stats ──────────────────────────────────────────────────
 

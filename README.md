@@ -27,13 +27,13 @@ project-root/
 │   └── routes/       # REST API endpoints
 ├── dashboard/        # React (Vite) frontend for live monitoring
 │   ├── src/          # React components (OfficeFloorplan, PowerInsight, etc.)
+│   │   ├── components/
+│   │   │   ├── OfficeFloorplan.tsx     # Visual 3-room layout with smart grid
+│   │   │   ├── PowerInsight.tsx        # Live wattage and kWh estimation
+│   │   │   ├── SupportModal.tsx        # Fetches dynamic /contacts
+│   │   │   └── ...                     # Other UI views
+│   │   └── hooks/
 │   └── package.json  # NPM dependencies
-    ├── components/
-    │   ├── OfficeFloorplan.tsx     # Visual 3-room layout with smart grid
-    │   ├── PowerInsight.tsx        # Live wattage and kWh estimation
-    │   ├── SupportModal.tsx        # Fetches dynamic /contacts
-    │   └── ...                     # Other UI views
-    ├── hooks/
 ├── bot/              # Discord.py bot
 │   ├── bot.py        # Client setup and automated alert polling
 │   ├── commands.py   # User commands (!status, !room, !usage)
