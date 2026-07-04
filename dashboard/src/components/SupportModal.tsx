@@ -47,7 +47,7 @@ export default function SupportModal({ isOpen, onClose }: SupportModalProps) {
               <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2">
                 <p className="font-mono text-xs uppercase text-primary font-bold">Node Diagnostics Information</p>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono text-on-surface-variant">
-                  <div>System ID: <span className="text-on-surface">SMART-HOME-MONITOR-01</span></div>
+                  <div>System ID: <span className="text-on-surface">SMART-OFFICE-MONITOR-01</span></div>
                   <div>Deployment: <span className="text-on-surface">Local Network</span></div>
                   <div>UI Version: <span className="text-on-surface">v1.0.0</span></div>
                   <div>Admin: <span className="text-on-surface">{SUPPORT_CONTACTS[0].email}</span></div>

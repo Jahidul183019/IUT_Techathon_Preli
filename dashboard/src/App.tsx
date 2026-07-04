@@ -13,7 +13,7 @@ import SecurityView from './components/SecurityView';
 import AddDeviceModal from './components/AddDeviceModal';
 import SupportModal from './components/SupportModal';
 import LogsModal from './components/LogsModal';
-import { Home, Map, Bell, User, Plus } from 'lucide-react';
+import { Building2, Map, Bell, User, Plus } from 'lucide-react';
 
 export default function App() {
   // Active Navigation Tab
@@ -204,7 +204,7 @@ export default function App() {
             activeTab === 'dashboard' ? 'text-secondary bg-secondary-container/10 scale-95' : 'text-on-surface-variant'
           }`}
         >
-          <Home className="w-5 h-5" />
+          <Building2 className="w-5 h-5" />
           <span className="text-[10px] font-bold mt-1">Dashboard</span>
         </button>
 
