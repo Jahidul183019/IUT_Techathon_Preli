@@ -39,7 +39,7 @@
 | Swagger UI | [https://iot-smart-home-backend-8au0.onrender.com/docs](https://iot-smart-home-backend-8au0.onrender.com/docs) |
 | Bot Service | [https://iot-smart-home-bot.onrender.com](https://iot-smart-home-bot.onrender.com) |
 | Hardware Schematic | [https://wokwi.com/projects/468536088941998081](https://wokwi.com/projects/468536088941998081) |
-| Video Demo | [https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3?fbclid=IwY2xjawS12IFleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEe9QOT6k1cN5Dx0rmuqPwGhSnM2WRg66-5kXd65cYhiKJNKRTQbaPVlVh_RgM_aem_zeLnqgz5Wc2lrehkZGILNw](https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3?fbclid=IwY2xjawS12IFleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEe9QOT6k1cN5Dx0rmuqPwGhSnM2WRg66-5kXd65cYhiKJNKRTQbaPVlVh_RgM_aem_zeLnqgz5Wc2lrehkZGILNw) |
+| Video Demo | [https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3](https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3) |
 
 ## Project Highlights
 
@@ -252,7 +252,7 @@ If dashboard variables are unset, [dashboard/src/hooks/useBackendDevices.ts](das
 |----------|--------|---------|
 | `/health` | GET | Backend health, device count, and connected WebSocket clients |
 | `/ws` | WebSocket | Live `snapshot`, `device_update`, `alert`, and `pong` messages |
-| `/api/devices/` | GET | All 18 devices with current state |
+| `/api/devices/` | GET | All 15 devices with current state |
 | `/api/devices/{room}` | GET | Devices for `drawing_room`, `work_room_1`, or `work_room_2` |
 | `/api/devices/{device_id}/toggle` | POST | Toggle one device and broadcast the update |
 | `/api/devices/stats/usage` | GET | Total watts, active devices, room usage, and estimated kWh today |
@@ -295,7 +295,7 @@ project-root/
 │   ├── requirements.txt
 │   ├── core/
 │   │   ├── alerts.py                # After-hours and continuous-load alert rules
-│   │   ├── models.py                # Pydantic models and 18-device seed data
+│   │   ├── models.py                # Pydantic models and 15-device seed data
 │   │   ├── simulator.py             # Async background device simulator
 │   │   ├── store.py                 # DeviceStore singleton
 │   │   └── time_utils.py
