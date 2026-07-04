@@ -175,7 +175,9 @@ app.include_router(devices_router, prefix="/api/devices", tags=["Devices"])
 
 # ── Health check ──
 @app.get("/", tags=["Health"])
+@app.head("/", tags=["Health"])
 @app.get("/health", tags=["Health"])
+@app.head("/health", tags=["Health"])
 async def health():
     return {
         "status": "ok",
