@@ -35,7 +35,7 @@
 | Service | URL |
 |---------|-----|
 | Dashboard | [https://iot-smart-home-dashboard.onrender.com](https://iot-smart-home-dashboard.onrender.com) |
-| Backend | [https://iot-smart-home-backend-8au0.onrender.com] (https://iot-smart-home-backend-8au0.onrender.com) |
+| Backend | [https://iot-smart-home-backend-8au0.onrender.com](https://iot-smart-home-backend-8au0.onrender.com) |
 | Bot Service | [https://iot-smart-home-bot.onrender.com](https://iot-smart-home-bot.onrender.com) |
 
 ## Project Highlights
