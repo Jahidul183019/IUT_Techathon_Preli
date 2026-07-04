@@ -6,6 +6,7 @@ the same instance the simulator mutates and WebSocket broadcasts from.
 """
 
 from datetime import datetime, timezone
+from core.time_utils import now_local
 
 from fastapi import APIRouter, HTTPException
 
@@ -43,7 +44,7 @@ async def get_usage():
     usage = device_store.get_usage()
 
     # Estimate today's kWh
-    now = datetime.now(timezone.utc)
+    now = now_local()
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     hours_elapsed = (now - midnight).total_seconds() / 3600
 
@@ -66,7 +67,7 @@ async def get_analytics():
     """Return full analytics data including historical curves and zone peaks."""
     usage = device_store.get_usage()
     
-    now = datetime.now(timezone.utc)
+    now = now_local()
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     hours_elapsed = (now - midnight).total_seconds() / 3600
     estimated_kwh = round((usage.total_watts * hours_elapsed) / 1000, 2)
