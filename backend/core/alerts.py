@@ -140,7 +140,9 @@ def check_continuous_full_room(now: datetime | None = None) -> list[Alert]:
         ]
         if any(t is None for t in turned_on_times):
             continue  # at least one device has no recorded turn-on time
-        oldest_change = min(turned_on_times)
+        # The entire room has only been ON since the LAST device was turned on.
+        # So we need the maximum (most recent) turn-on time.
+        oldest_change = max(turned_on_times)
         if oldest_change.tzinfo is None:
             oldest_change = oldest_change.replace(tzinfo=timezone.utc)
 
