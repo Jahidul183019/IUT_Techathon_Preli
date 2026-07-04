@@ -24,6 +24,19 @@ def run_health_server():
                 self.send_header("Content-type", "text/plain")
                 self.end_headers()
                 self.wfile.write(b"Bot is online and healthy")
+            elif self.path == "/check-llm":
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                
+                import json
+                keys_status = {
+                    "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
+                    "GROQ_API_KEY_1": bool(os.getenv("GROQ_API_KEY_1")),
+                    "GROQ_API_KEY_2": bool(os.getenv("GROQ_API_KEY_2")),
+                    "GROQ_API_KEY_3": bool(os.getenv("GROQ_API_KEY_3")),
+                }
+                self.wfile.write(json.dumps(keys_status).encode('utf-8'))
             else:
                 self.send_response(404)
                 self.end_headers()
