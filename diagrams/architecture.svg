@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Smart Home IoT Monitor Clean Architecture</title>
-  <desc id="desc">Clean left-to-right architecture diagram for the Smart Home IoT Monitor.</desc>
+  <title id="title">Smart Office IoT Monitor Clean Architecture</title>
+  <desc id="desc">Clean left-to-right architecture diagram for the Smart Office IoT Monitor.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M0 0L10 5L0 10Z" fill="#334155"/>
@@ -32,7 +32,7 @@
   </defs>
 
   <rect class="bg" width="1600" height="900"/>
-  <text x="800" y="54" text-anchor="middle" class="title">Smart Home IoT Monitor Architecture</text>
+  <text x="800" y="54" text-anchor="middle" class="title">Smart Office IoT Monitor Architecture</text>
   <text x="800" y="82" text-anchor="middle" class="subtitle">One FastAPI backend owns device state. Dashboard and Discord bot consume the same live source of truth.</text>
 
   <!-- Panels -->

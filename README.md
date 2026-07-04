@@ -1,6 +1,6 @@
 <div align="center">
 
-# Smart Home IoT Monitor
+# Smart Office IoT Monitor
 ### *Sense it. Stream it. Act on it.*
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
@@ -52,7 +52,7 @@
 
 ## Introduction
 
-Smart Home IoT Monitor was built for the IUT Techathon preliminary round. It demonstrates how an office automation system can monitor fans and lights in real time, estimate current power draw, surface actionable alerts, and expose the same state to both a web dashboard and a Discord bot.
+Smart Office IoT Monitor was built for the IUT Techathon preliminary round. It demonstrates how an office automation system can monitor fans and lights in real time, estimate current power draw, surface actionable alerts, and expose the same state to both a web dashboard and a Discord bot.
 
 The backend is intentionally the authority. The simulator, dashboard toggles, REST routes, WebSocket broadcasts, and bot commands all read from or mutate the same `DeviceStore` singleton in [backend/core/store.py](backend/core/store.py). This keeps the dashboard and bot synchronized without separate client-side state machines.
 

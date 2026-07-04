@@ -1,8 +1,8 @@
-# System Architecture - Smart Home IoT Monitor
+# System Architecture - Smart Office IoT Monitor
 
 This diagram shows the project at a presentation level: the simulator and hardware concept feed one FastAPI backend, the backend owns all device state, and the dashboard plus Discord bot consume that same source of truth.
 
-![Smart Home IoT Monitor architecture](./architecture.png)
+![Smart Office IoT Monitor architecture](./architecture.png)
 
 ## Main Components
 

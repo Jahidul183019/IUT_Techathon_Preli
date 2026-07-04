@@ -1,4 +1,4 @@
-// Smart Home IoT Monitor - Overall Architecture
+// Smart Office IoT Monitor - Overall Architecture
 // Source for diagrams/architecture.svg and diagrams/architecture.png.
 // Regenerate with Graphviz when available:
 //   dot -Tsvg diagrams/architecture.dot -o diagrams/architecture.svg
@@ -13,7 +13,7 @@ digraph Architecture {
         nodesep=0.55,
         ranksep=0.95,
         pad=0.25,
-        label="Smart Home IoT Monitor - Overall Architecture",
+        label="Smart Office IoT Monitor - Overall Architecture",
         labelloc=t,
         fontsize=24,
         fontname="Helvetica-Bold",

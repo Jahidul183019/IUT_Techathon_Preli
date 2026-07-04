@@ -15,7 +15,7 @@ export default function LogsModal({ isOpen, onClose, activeLoad, deviceCount, ro
   const [inputValue, setInputValue] = useState<string>('');
 
   const bootLogs = [
-    'Initializing Smart Home IoT Monitor...',
+    'Initializing Smart Office IoT Monitor...',
     'Starting backend supervisor services... [OK]',
     `Connecting to live gateway broker at ${import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws'}... [CONNECTED]`,
     'Syncing office layout matrices... done.',
