@@ -5,7 +5,7 @@ As per the hackathon requirements, the physical office consists of 3 rooms (Draw
 
 To demonstrate the hardware architecture conceptually without overcomplicating the simulation interface, this circuit provides a **representative simulation for a single room (5 devices)** using an ESP32 microcontroller. Because the hardware logic, pin assignments, and software architecture are identical for all three rooms, proving the concept for one room mathematically and electrically validates the entire system. 
 
-The design is fully simulated in Wokwi. Since Wokwi does not natively support high-voltage AC mains components (like 220V ceiling fans or incandescent bulbs), we use standard low-voltage electronic components as stand-ins. **The design makes physical sense** by mirroring the exact logical flow, current constraints, and pin selection rules that a real-world smart home system must follow to operate safely and reliably.
+The design is fully simulated in Wokwi. Since Wokwi does not natively support high-voltage AC mains components (like 220V ceiling fans or incandescent bulbs), we use standard low-voltage electronic components as stand-ins. **The design makes physical sense** by mirroring the exact logical flow, current constraints, and pin selection rules that a real-world smart office system must follow to operate safely and reliably.
 
 ## 2. How to View and Run the Simulation
 Judges can interact with the live circuit simulation directly in their browser using Wokwi. The interface allows for real-time manipulation of environmental variables.

@@ -172,7 +172,7 @@ async def poll_alerts():
 
                 total = len(new_alerts)
                 header = (
-                    f"Hey everyone! The Smart Home system just flagged "
+                    f"Hey everyone! The Smart Office system just flagged "
                     f"**{total} alert{'s' if total > 1 else ''}**:\n"
                 )
                 grouped_message = header + "\n".join(lines)

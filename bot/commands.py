@@ -1,5 +1,5 @@
 """
-Bot commands cog for IoT Smart Home.
+Bot commands cog for IoT Smart Office.
 Implements !status, !room, and !usage with conversational responses.
 """
 
@@ -72,7 +72,7 @@ async def generate_response(data: dict, command: str, fallback: str) -> str:
     return fallback
 
 class DeviceCommands(commands.Cog):
-    """Commands for interacting with the Smart Home system."""
+    """Commands for interacting with the Smart Office system."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -98,12 +98,12 @@ class DeviceCommands(commands.Cog):
 
     @commands.command()
     async def status(self, ctx: commands.Context):
-        """Summarizes the status of all rooms in the smart home."""
+        """Summarizes the status of all rooms in the smart office."""
         async with httpx.AsyncClient(follow_redirects=True) as client:
             try:
                 resp = await client.get(f"{BACKEND_URL}/api/devices")
                 if resp.status_code != 200:
-                    await ctx.send("Oops! I couldn't reach the smart home backend right now. 😥")
+                    await ctx.send("Oops! I couldn't reach the smart office backend right now. 😥")
                     return
                 
                 devices = resp.json().get("devices", [])

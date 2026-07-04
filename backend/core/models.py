@@ -1,5 +1,5 @@
 """
-Pydantic models for the IoT Smart Home Monitor.
+Pydantic models for the IoT Smart Office Monitor.
 
 Device inventory: 3 rooms × 5 devices/room = 15 total
   Each room: 2 fans + 3 lights

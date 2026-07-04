@@ -30,7 +30,7 @@ export default function TopNavBar({
       {/* Brand logo and connection indicator */}
       <div className="flex items-center gap-4">
         <span className="font-sans text-xl font-black tracking-tighter text-primary">
-          Smart Home IoT
+          Smart Office IoT
         </span>
         <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-surface-container-low border border-outline-variant rounded-full">
           <Signal className={`w-3.5 h-3.5 ${isConnected ? 'text-secondary' : 'text-tertiary'}`} />

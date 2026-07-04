@@ -127,7 +127,7 @@ async def lifespan(app: FastAPI):
 # ══════════════════════════════════════════════════════════════════════
 
 app = FastAPI(
-    title="IoT Smart Home Monitor API",
+    title="IoT Smart Office Monitor API",
     version="0.1.0",
     description="Real-time IoT device monitoring with WebSocket and REST",
     lifespan=lifespan,

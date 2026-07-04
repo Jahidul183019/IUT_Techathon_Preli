@@ -104,7 +104,7 @@ The backend is intentionally the authority. The simulator, dashboard toggles, RE
 
 ## System Architecture
 
-![IoT Smart Home Monitor architecture](diagrams/architecture.png)
+![IoT Smart Office Monitor architecture](diagrams/architecture.png)
 
 The architecture diagram is maintained as Graphviz source in [diagrams/architecture.dot](diagrams/architecture.dot), with rendered PNG/SVG outputs committed in [diagrams/](diagrams/). The full arrow reference and regeneration instructions are documented in [diagrams/architecture.md](diagrams/architecture.md).
 
