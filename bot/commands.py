@@ -10,7 +10,7 @@ from discord.ext import commands
 from groq import AsyncGroq
 import google.generativeai as genai
 
-BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000")
+BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000").rstrip("/")
 GROQ_API_KEY_1 = os.getenv("GROQ_API_KEY_1", "")
 GROQ_API_KEY_2 = os.getenv("GROQ_API_KEY_2", "")
 GROQ_API_KEY_3 = os.getenv("GROQ_API_KEY_3", "")

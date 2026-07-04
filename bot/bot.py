@@ -34,7 +34,7 @@ def run_health_server():
     server.serve_forever()
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "")
-BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000")
+BACKEND_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000").rstrip("/")
 # Use a specific channel ID if provided, otherwise the bot will try to use the first available channel
 ALERT_CHANNEL_ID = os.getenv("DISCORD_ALERT_CHANNEL_ID", "")
 
