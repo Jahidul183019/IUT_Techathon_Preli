@@ -39,7 +39,7 @@
 | Swagger UI | [https://iot-smart-home-backend-8au0.onrender.com/docs](https://iot-smart-home-backend-8au0.onrender.com/docs) |
 | Bot Service | [https://iot-smart-home-bot.onrender.com](https://iot-smart-home-bot.onrender.com) |
 | Hardware Schematic | [https://wokwi.com/projects/468536088941998081](https://wokwi.com/projects/468536088941998081) |
-| Video Demo | [https://drive.google.com/file/d/1bZEZ4Od3iDDc82K1iIh6pr1Ntr53VLIA/view?usp=sharing](https://drive.google.com/file/d/1bZEZ4Od3iDDc82K1iIh6pr1Ntr53VLIA/view?usp=sharing) |
+| Video Demo | [https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3?fbclid=IwY2xjawS12IFleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEe9QOT6k1cN5Dx0rmuqPwGhSnM2WRg66-5kXd65cYhiKJNKRTQbaPVlVh_RgM_aem_zeLnqgz5Wc2lrehkZGILNw](https://drive.google.com/drive/folders/1tdfbYcPZ4_oGMTihkv7ReNgwHAaDRog3?fbclid=IwY2xjawS12IFleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEe9QOT6k1cN5Dx0rmuqPwGhSnM2WRg66-5kXd65cYhiKJNKRTQbaPVlVh_RgM_aem_zeLnqgz5Wc2lrehkZGILNw) |
 
 ## Project Highlights
 
