@@ -145,28 +145,44 @@ async def poll_alerts():
                         break
             
             if channel:
+                # Mark all new alerts as seen first
                 for alert in new_alerts:
-                    # Mark as seen
                     seen_alerts.add(alert["id"])
-                    
-                    # Prevent memory leak over time
-                    if len(seen_alerts) > 1000:
-                        # simple clear, realistically we'd do something smarter but this is fine for a demo
-                        seen_alerts.clear()
-                        
-                    msg = alert.get("message", "Unknown Alert")
-                    severity = alert.get("severity", "warning")
-                    
-                    if severity == "critical":
-                        prefix = "🚨 **CRITICAL ALERT** 🚨"
-                    elif severity == "warning":
-                        prefix = "⚠️ **Warning**"
-                    else:
-                        prefix = "ℹ️ **Info**"
-                        
-                    friendly_message = f"{prefix}\nHey everyone! I just got a notification from the Smart Home system:\n> {msg}"
-                    
-                    await channel.send(friendly_message)
+                if len(seen_alerts) > 1000:
+                    seen_alerts.clear()
+
+                # Group by severity — send ONE message instead of one per device
+                critical = [a for a in new_alerts if a.get("severity") == "critical"]
+                warnings  = [a for a in new_alerts if a.get("severity") == "warning"]
+                infos     = [a for a in new_alerts if a.get("severity") not in ("critical", "warning")]
+
+                lines = []
+                if critical:
+                    lines.append("🚨 **CRITICAL ALERTS**")
+                    for a in critical:
+                        lines.append(f"  • {a.get('message', 'Unknown')}")
+                if warnings:
+                    lines.append("⚠️ **Warnings**")
+                    for a in warnings:
+                        lines.append(f"  • {a.get('message', 'Unknown')}")
+                if infos:
+                    lines.append("ℹ️ **Info**")
+                    for a in infos:
+                        lines.append(f"  • {a.get('message', 'Unknown')}")
+
+                total = len(new_alerts)
+                header = (
+                    f"Hey everyone! The Smart Home system just flagged "
+                    f"**{total} alert{'s' if total > 1 else ''}**:\n"
+                )
+                grouped_message = header + "\n".join(lines)
+
+                # Discord message limit is 2000 chars — truncate if needed
+                if len(grouped_message) > 1900:
+                    grouped_message = grouped_message[:1900] + "\n…(truncated)"
+
+                await channel.send(grouped_message)
+
     except Exception as e:
         print(f"Error polling alerts: {e}")
 
@@ -184,3 +200,4 @@ if __name__ == "__main__":
     
     # Run the bot
     bot.run(TOKEN)
+
