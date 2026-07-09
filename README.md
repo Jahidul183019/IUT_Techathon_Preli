@@ -25,7 +25,7 @@
 
 | # | Member |
 |---|--------|
-| 1 | Md. Jahidul Islam Sarkar |
+| 1 | Md. Jahidul Islam Sarker |
 | 2 | Shadman Zaman Sajid |
 | 3 | Md. Irfan Iqbal |
 | 4 | Swarlok Samadder |
